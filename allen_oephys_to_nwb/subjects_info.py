@@ -1,154 +1,154 @@
 subjects_info = {
     '222549': {
         'line': 'Emx1-s',
-        'age': '101d',
+        'age': 'P101D',
         'anesthesia': 'Isoflurane',
         'indicator': 'GCaMP6s'
     },
 
     '223421': {
         'line': 'Emx1-s',
-        'age': '109d',
+        'age': 'P109D',
         'anesthesia': 'Isoflurane',
         'indicator': 'GCaMP6s'
     },
 
     '223417': {
         'line': 'Emx1-s',
-        'age': '116d',
+        'age': 'P116D',
         'anesthesia': 'Isoflurane',
         'indicator': 'GCaMP6s'
     },
 
     '220066': {
         'line': 'Emx1-s',
-        'age': '147d',
+        'age': 'P147D',
         'anesthesia': 'Isoflurane',
         'indicator': 'GCaMP6s'
     },
 
     '294856': {
         'line': 'Emx1-s',
-        'age': '80d',
+        'age': 'P80D',
         'anesthesia': 'Isoflurane',
         'indicator': 'GCaMP6s'
     },
 
     '300049': {
         'line': 'Emx1-s',
-        'age': '63d',
+        'age': 'P63D',
         'anesthesia': 'Urethane',
         'indicator': 'GCaMP6s'
     },
 
     '300050': {
         'line': 'Emx1-s',
-        'age': '65d',
+        'age': 'P65D',
         'anesthesia': 'Urethane',
         'indicator': 'GCaMP6s'
     },
 
     '190992': {
         'line': 'tetO-s',
-        'age': '113d',
+        'age': 'P113D',
         'anesthesia': 'Isoflurane',
         'indicator': 'GCaMP6s'
     },
 
     '228048': {
         'line': 'tetO-s',
-        'age': '89d',
+        'age': 'P89D',
         'anesthesia': 'Isoflurane',
         'indicator': 'GCaMP6s'
     },
 
     '228999': {
         'line': 'Emx1-f',
-        'age': '94d',
+        'age': 'P94D',
         'anesthesia': 'Isoflurane',
         'indicator': 'GCaMP6f'
     },
 
     '229003': {
         'line': 'Emx1-f',
-        'age': '96d',
+        'age': 'P96D',
         'anesthesia': 'Isoflurane',
         'indicator': 'GCaMP6f'
     },
 
     '248720': {
         'line': 'Emx1-f',
-        'age': '110d',
+        'age': 'P110D',
         'anesthesia': 'Isoflurane',
         'indicator': 'GCaMP6f'
     },
 
     '248721': {
         'line': 'Emx1-f',
-        'age': '117d',
+        'age': 'P117D',
         'anesthesia': 'Isoflurane',
         'indicator': 'GCaMP6f'
     },
 
     '252699': {
         'line': 'Emx1-f',
-        'age': '102d',
+        'age': 'P102D',
         'anesthesia': 'Isoflurane',
         'indicator': 'GCaMP6f'
     },
 
     '254379': {
         'line': 'Emx1-f',
-        'age': '95d',
+        'age': 'P95D',
         'anesthesia': 'Isoflurane',
         'indicator': 'GCaMP6f'
     },
 
     '268768': {
         'line': 'Cux2-f',
-        'age': '180d',
+        'age': 'P180D',
         'anesthesia': 'Isoflurane',
         'indicator': 'GCaMP6f'
     },
 
     '291932': {
         'line': 'Cux2-f',
-        'age': '82d',
+        'age': 'P82D',
         'anesthesia': 'Isoflurane',
         'indicator': 'GCaMP6f'
     },
 
     '291933': {
         'line': 'Cux2-f',
-        'age': '83d',
+        'age': 'P83D',
         'anesthesia': 'Isoflurane',
         'indicator': 'GCaMP6f'
     },
 
     '299480': {
         'line': 'Cux2-f',
-        'age': '72d',
+        'age': 'P72D',
         'anesthesia': 'Urethane',
         'indicator': 'GCaMP6f'
     },
 
     '299485': {
         'line': 'Cux2-f',
-        'age': '87d',
+        'age': 'P87D',
         'anesthesia': 'Urethane',
         'indicator': 'GCaMP6f'
     },
 
     '299484': {
         'line': 'Cux2-f',
-        'age': '92d',
+        'age': 'P92D',
         'anesthesia': 'Isoflurane',
         'indicator': 'GCaMP6f'
     },
 
     '303538': {
         'line': 'Cux2-f',
-        'age': '79d',
+        'age': 'P79D',
         'anesthesia': 'Isoflurane',
         'indicator': 'GCaMP6f'
     }
