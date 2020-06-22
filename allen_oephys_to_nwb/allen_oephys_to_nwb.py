@@ -5,6 +5,7 @@ from pynwb.file import Subject
 from pynwb.ophys import TwoPhotonSeries, OpticalChannel, Fluorescence, ImageSegmentation
 from pynwb.device import Device
 from hdmf.data_utils import DataChunkIterator
+from nwb_conversion_tools import NWBConverter
 
 from .subjects_info import subjects_info
 
@@ -12,6 +13,81 @@ from pathlib import Path
 from libtiff import TIFF
 import numpy as np
 import h5py
+
+
+class AllenOephysNWBConverter(NWBConverter):
+
+    def __init__(self, source_paths, metadata=None, nwbfile=None):
+        # Set up metadata with info from files
+        with h5py.File(source_paths['path_processed'], 'r') as f:
+            session_identifier = str(int(f['tid'][0]))
+            animal_id = str(int(f['aid'][0]))
+            subject_info = subjects_info[animal_id]
+
+        # File metadata
+        meta_nwbfile = {
+            'session_description': 'session description',
+            'identifier': session_identifier,
+            'session_start_time': datetime.now(tzlocal()),
+            'pharmacology': subject_info['anesthesia'],
+        }
+        if metadata is None:
+            metadata = {}
+            metadata['NWBFile'] = meta_nwbfile
+        else:
+            metadata['NWBFile'].update(meta_nwbfile)
+
+        # Subject metadata
+        meta_subject = {
+            'subject_id': animal_id,
+            'genotype': subject_info['line'],
+            'age': subject_info['age']
+        }
+        if 'Subject' in metadata:
+            metadata['Subject'].update(meta_subject)
+        else:
+            metadata['Subject'] = meta_subject
+
+        # Ecephys metadata
+        meta_ecephys = {
+            'Device': {'name': 'MultiClamp 700B'},
+            'ElectrodeGroup': [{
+                'description': '2-p targeted cell-attached',
+                'device': 'MultiClamp 700B',
+                'name': 'electrode_group',
+                'location': 'primary visual cortex',
+            }]
+        }
+        if 'Ecephys' in metadata:
+            raise NotImplementedError('TODO - deep dict update')
+            metadata['Ecephys'].update(meta_ecephys)
+        else:
+            metadata['Ecephys'] = meta_ecephys
+
+        super().__init__(metadata=metadata, nwbfile=nwbfile, source_paths=source_paths)
+
+    def create_electrodes_ecephys(self):
+        """
+        This method should be overridden by child classes if necessary.
+        Create electrodes in the NWBFile.
+        """
+        pass
+
+    def add_ecephys_acquisition(self, meta_acquisition):
+        """Add raw / filtered membrane voltage data"""
+        raise NotImplementedError('TODO')
+
+    def add_ophys_acquisition(self, meta_acquisition):
+        """Add raw ophys data in tiff files"""
+        raise NotImplementedError('TODO')
+
+    def add_ophys_processed(self, meta_processed):
+        """Add Fluorescence data"""
+        raise NotImplementedError('TODO')
+
+    def add_spiking(self, meta_processed):
+        """Add spiking data"""
+        raise NotImplementedError('TODO')
 
 
 def convert2nwb(path_raw, path_tiff, path_processed, path_output):
@@ -41,7 +117,7 @@ def convert2nwb(path_raw, path_tiff, path_processed, path_output):
     path_raw = Path(path_raw)
     f_raw = h5py.File(path_raw, 'r')
 
-    # Read processeddata
+    # Read processed high zoom data
     path_processed = Path(path_processed)
     f_processed = h5py.File(path_processed, 'r')
 
@@ -87,6 +163,12 @@ def convert2nwb(path_raw, path_tiff, path_processed, path_output):
         unit='no unit'
     )
     nwbfile.add_acquisition(two_photon_series)
+
+    # Electrophysiology
+
+    # Raw membrane voltage trace and dt
+
+
 
     # Filtered membrane voltage and ephys dt
     filtered_voltage_trace = np.squeeze(f_processed['Vmfd'])
