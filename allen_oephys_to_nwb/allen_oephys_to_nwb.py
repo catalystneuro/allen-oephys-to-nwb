@@ -11,6 +11,7 @@ from .subjects_info import subjects_info
 
 from pathlib import Path
 from libtiff import TIFF
+import PIL as pil
 import numpy as np
 import h5py
 
@@ -56,10 +57,6 @@ class AllenOephysNWBConverter(NWBConverter):
 
     def add_ecephys_acquisition(self, meta_acquisition):
         """Add raw / filtered membrane voltage data"""
-        raise NotImplementedError('TODO')
-
-    def add_ophys_acquisition(self):
-        """Add raw ophys data from tiff files"""
         raise NotImplementedError('TODO')
 
     def _get_imaging_plane(self):
@@ -146,6 +143,49 @@ class AllenOephysNWBConverter(NWBConverter):
                 unit='no unit'
             )
 
+    def add_ophys_acquisition(self, link=True):
+        """Add raw ophys data from tiff files"""
+
+        # Iteratively read tiff ophys data
+        def tiff_iterator(paths_tiff):
+            for tf in paths_tiff:
+                tif = TIFF.open(tf)
+                for image in tif.iter_images():
+                    yield image
+                tif.close()
+
+        with h5py.File(self.source_paths['path_processed'], 'r') as f:
+            imaging_rate = 1 / f['dto'][0]
+        imaging_plane = self._get_imaging_plane()
+
+        # Link to raw data files
+        if link:
+            starting_frames = [0]
+            for i, tf in enumerate(self.source_paths['paths_tiff'][0:-1]):
+                n_frames = pil.Image.open(tf).n_frames
+                starting_frames.append(n_frames + starting_frames[i])
+            two_photon_series = TwoPhotonSeries(
+                name='raw_ophys',
+                imaging_plane=imaging_plane,
+                format='tiff',
+                external_file=self.source_paths['paths_tiff'],
+                starting_frame=starting_frames,
+                starting_time=0.,
+                rate=imaging_rate,
+                unit='no unit'
+            )
+        # Store raw data
+        else:
+            raw_data_iterator = DataChunkIterator(data=tiff_iterator(self.source_paths['paths_tiff']))
+            two_photon_series = TwoPhotonSeries(
+                name='raw_ophys',
+                imaging_plane=imaging_plane,
+                data=raw_data_iterator,
+                starting_time=0.,
+                rate=imaging_rate,
+                unit='no unit'
+            )
+        self.nwbfile.add_acquisition(two_photon_series)
 
     def add_spiking(self, meta_processed):
         """Add spiking data"""
@@ -160,8 +200,8 @@ def convert2nwb(path_raw, path_tiff, path_processed, path_output):
     -----------
     path_raw: str, path
         Path to H5 file containing raw electrophys data
-    path_tiff: str, path
-        Path to TIF file containing raw ophys data
+    path_tiff: list of str, path
+        List with paths to TIF files containing raw ophys data
     path_processed: str, path
         Path to H5 file containing processed electrophys and ophys data
     path_output: str, path
