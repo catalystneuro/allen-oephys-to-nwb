@@ -3,6 +3,7 @@ from dateutil.tz import tzlocal
 from pynwb import NWBFile, NWBHDF5IO
 from pynwb.file import Subject
 from pynwb.ophys import TwoPhotonSeries, OpticalChannel, Fluorescence, ImageSegmentation
+from pynwb.ecephys import ElectricalSeries
 from pynwb.device import Device
 from hdmf.data_utils import DataChunkIterator
 from nwb_conversion_tools import NWBConverter
@@ -51,14 +52,44 @@ class AllenOephysNWBConverter(NWBConverter):
 
         super().__init__(metadata=metadata, nwbfile=nwbfile, source_paths=source_paths)
 
-    def create_electrodes_ecephys(self):
+    def _create_electrodes_ecephys(self):
         """Add electrode"""
-        raise NotImplementedError('TODO')
+        electrode_group = list(self.nwbfile.electrode_groups.values())[0]
+        self.nwbfile.add_electrode(
+            id=0,
+            x=np.nan, y=np.nan, z=np.nan,
+            imp=np.nan,
+            location='location',
+            filtering='none',
+            group=electrode_group
+        )
 
-    def add_ecephys_acquisition(self):
+    def add_ecephys_acquisition(self, trace=['raw', 'filtered']):
         """Add raw / filtered membrane voltage data"""
-        raise NotImplementedError('TODO')
 
+        self._create_electrodes_ecephys()
+        with h5py.File(self.source_paths['path_processed'], 'r') as f:
+            electrode_table_region = self.nwbfile.create_electrode_table_region(
+                region=[0],
+                description='electrode'
+            )
+            ecephys_rate = 1 / f['dte'][0]
+
+            for tr in trace:
+                if tr == 'raw':
+                    trace_data = np.squeeze(f['Vm'])
+                    trace_name = 'raw_membrane_voltage'
+                if tr == 'filtered':
+                    trace_data = np.squeeze(f['Vmfd'])
+                    trace_name = 'filtered_membrane_voltage'
+                electrical_series = ElectricalSeries(
+                    name=trace_name,
+                    data=trace_data,
+                    electrodes=electrode_table_region,
+                    starting_time=0.,
+                    rate=ecephys_rate,
+                )
+                self.nwbfile.add_acquisition(electrical_series)
 
     def _get_imaging_plane(self):
         """Add new / return existing Imaging Plane"""
