@@ -48,42 +48,104 @@ class AllenOephysNWBConverter(NWBConverter):
         else:
             metadata['Subject'] = meta_subject
 
-        # Ecephys metadata
-        meta_ecephys = {
-            'Device': {'name': 'MultiClamp 700B'},
-            'ElectrodeGroup': [{
-                'description': '2-p targeted cell-attached',
-                'device': 'MultiClamp 700B',
-                'name': 'electrode_group',
-                'location': 'primary visual cortex',
-            }]
-        }
-        if 'Ecephys' in metadata:
-            raise NotImplementedError('TODO - deep dict update')
-            metadata['Ecephys'].update(meta_ecephys)
-        else:
-            metadata['Ecephys'] = meta_ecephys
-
         super().__init__(metadata=metadata, nwbfile=nwbfile, source_paths=source_paths)
 
     def create_electrodes_ecephys(self):
-        """
-        This method should be overridden by child classes if necessary.
-        Create electrodes in the NWBFile.
-        """
-        pass
+        """Add electrode"""
+        raise NotImplementedError('TODO')
 
     def add_ecephys_acquisition(self, meta_acquisition):
         """Add raw / filtered membrane voltage data"""
         raise NotImplementedError('TODO')
 
-    def add_ophys_acquisition(self, meta_acquisition):
-        """Add raw ophys data in tiff files"""
+    def add_ophys_acquisition(self):
+        """Add raw ophys data from tiff files"""
         raise NotImplementedError('TODO')
 
-    def add_ophys_processed(self, meta_processed):
+    def _get_imaging_plane(self):
+        """Add new / return existing Imaging Plane"""
+        meta_imgplane = self.metadata['Ophys']['ImagingPlane'][0]
+        if meta_imgplane['name'] in self.nwbfile.imaging_planes:
+            imaging_plane = self.nwbfile.imaging_planes[meta_imgplane['name']]
+        else:
+            with h5py.File(self.source_paths['path_processed'], 'r') as f:
+                if 'depth' in f:
+                    description = 'high zoom'
+                else:
+                    description = 'low zoom'
+                animal_id = str(int(f['aid'][0]))
+                subject_info = subjects_info[animal_id]
+                indicator = subject_info['indicator']
+                imaging_rate = 1 / f['dto'][0]
+
+                # Create Imaging Plane
+                meta_optch = meta_imgplane['optical_channel'][0]
+                optical_channel = OpticalChannel(**meta_optch)
+                imaging_plane = self.nwbfile.create_imaging_plane(
+                    name='imaging_plane',
+                    optical_channel=optical_channel,
+                    description=description,
+                    device=self.nwbfile.devices[meta_imgplane['device']],
+                    excitation_lambda=meta_imgplane['excitation_lambda'],
+                    indicator=indicator,
+                    location=meta_imgplane['location'],
+                    imaging_rate=imaging_rate,
+                )
+
+        return imaging_plane
+
+    def add_ophys_processed(self):
         """Add Fluorescence data"""
-        raise NotImplementedError('TODO')
+        imaging_plane = self._get_imaging_plane()
+        with h5py.File(self.source_paths['path_processed'], 'r') as f:
+            # Stores segmented data
+            ophys_module = self.nwbfile.create_processing_module(
+                name='ophys',
+                description='contains optical physiology processed data'
+            )
+
+            meta_imgseg = self.metadata['Ophys']['ImageSegmentation']
+            img_seg = ImageSegmentation(name=meta_imgseg['name'])
+            ophys_module.add(img_seg)
+
+            meta_planeseg = meta_imgseg['plane_segmentations'][0]
+            plane_segmentation = img_seg.create_plane_segmentation(
+                name=meta_planeseg['name'],
+                description=meta_planeseg['description'],
+                imaging_plane=imaging_plane,
+            )
+
+            # ROIs
+            n_rows = int(f['linesPerFrame'][0])
+            n_cols = int(f['pixelsPerLine'][0][0])
+            pixel_mask = []
+            for pi in np.squeeze(f['pixel_list'][:]):
+                row = int(pi // n_rows)
+                col = int(pi % n_rows)
+                pixel_mask.append([col, row, 1])
+            plane_segmentation.add_roi(pixel_mask=pixel_mask)
+
+            # Fluorescene data
+            meta_fluorescence = self.metadata['Ophys']['Fluorescence']
+            fl = Fluorescence(name=meta_fluorescence['name'])
+            ophys_module.add(fl)
+
+            fluorescence_mean_trace = np.squeeze(f['f_cell'])
+            rt_region = plane_segmentation.create_roi_table_region(
+                description='unique cell ROI',
+                region=[0]
+            )
+
+            imaging_rate = 1 / f['dto'][0]
+            fl.create_roi_response_series(
+                name=meta_fluorescence['roi_response_series'][0]['name'],
+                data=fluorescence_mean_trace,
+                rois=rt_region,
+                rate=imaging_rate,
+                starting_time=0.,
+                unit='no unit'
+            )
+
 
     def add_spiking(self, meta_processed):
         """Add spiking data"""
