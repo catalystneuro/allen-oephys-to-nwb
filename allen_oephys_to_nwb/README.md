@@ -51,6 +51,9 @@ converter.add_spiking_data()
 # Add Voltage traces, trace = ['raw', 'filtered']
 converter.add_ecephys_acquisition(trace=['raw', 'filtered'])
 
+# Add trials
+converter.add_trials()
+
 # Save to file
 path_output = 'oephys_example.nwb'
 converter.save(to_path=path_output, read_check=True)

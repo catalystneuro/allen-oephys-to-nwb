@@ -257,32 +257,3 @@ class AllenOephysNWBConverter(NWBConverter):
                     )
             else:
                 print('This file does not have stimulation data!')
-
-
-def convert2nwb(path_raw, path_tiff, path_processed, path_output):
-    """
-    Convert Optophysiology and Electrophysiology data to NWB.
-
-    Parameters:
-    -----------
-    path_raw: str, path
-        Path to H5 file containing raw electrophys data
-    path_tiff: list of str, path
-        List with paths to TIF files containing raw ophys data
-    path_processed: str, path
-        Path to H5 file containing processed electrophys and ophys data
-    path_output: str, path
-        Path to output NWB file
-    """
-
-    # Read processed data
-    path_processed = Path(path_processed)
-    f_processed = h5py.File(path_processed, 'r')
-
-    # Filtered membrane voltage and ephys dt
-    filtered_voltage_trace = np.squeeze(f_processed['Vmfd'])
-    filtered_dt = f_processed['dte'][0]
-
-    # Ophys and Ephys traces should be aligned using the provided frame sync (iFrames)
-    # (i.e. the matching Ephys starts at iFrames(1))
-    sync_dt = f_processed['iFrames']
