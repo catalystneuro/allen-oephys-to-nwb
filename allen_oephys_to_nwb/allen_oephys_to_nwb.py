@@ -12,7 +12,7 @@ from .subjects_info import subjects_info
 
 from pathlib import Path
 from libtiff import TIFF
-import PIL as pil
+from PIL import Image as pImage
 import numpy as np
 import h5py
 
@@ -22,9 +22,15 @@ class AllenOephysNWBConverter(NWBConverter):
     def __init__(self, source_paths, metadata=None, nwbfile=None):
         # Set up metadata with info from files
         with h5py.File(source_paths['path_processed'], 'r') as f:
-            session_identifier = str(int(f['tid'][0]))
-            animal_id = str(int(f['aid'][0]))
-            subject_info = subjects_info[animal_id]
+            if np.isnan(f['aid'][0]):
+                print(f"File {source_paths['path_processed']} does not have 'aid' key. Skipping it...")
+                self.valid = False
+                return
+            else:
+                session_identifier = str(int(f['tid'][0]))
+                animal_id = str(int(f['aid'][0]))
+                subject_info = subjects_info[animal_id]
+                self.valid = True
 
         # File metadata
         meta_nwbfile = {
@@ -197,7 +203,7 @@ class AllenOephysNWBConverter(NWBConverter):
         if link:
             starting_frames = [0]
             for i, tf in enumerate(self.source_paths['paths_tiff'][0:-1]):
-                n_frames = pil.Image.open(tf).n_frames
+                n_frames = pImage.open(tf).n_frames
                 starting_frames.append(n_frames + starting_frames[i])
             two_photon_series = TwoPhotonSeries(
                 name='raw_ophys',
