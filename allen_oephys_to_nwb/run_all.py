@@ -4,7 +4,8 @@ import yaml
 import argparse
 
 
-def run_all(path_oephys, ids=None):
+def run_all(path_oephys_calibration, path_oephys_processed, path_oephys_raw,
+            path_base_output=None, ids=None):
     """
     Sweep all files in directory and set up paths for conversion
 
@@ -16,23 +17,37 @@ def run_all(path_oephys, ids=None):
         Runs conversion only for the specific ids (used only for testing)
     """
 
-    path_oephys = Path(path_oephys)
-    path_base_output = path_oephys / 'nwb_converted'
+    path_oephys_calibration = Path(path_oephys_calibration)
+    path_oephys_processed = Path(path_oephys_processed)
+    path_oephys_raw = Path(path_oephys_raw)
+    if path_base_output is None:
+        path_base_output = path_oephys_calibration / 'nwb_converted'
 
-    all_raw_paths = list((path_oephys / 'raw_data').rglob('*.h5'))
-    all_processed_paths = list((path_oephys / 'processed_data').rglob('*.h5'))
+    all_paths_calibration = [f for f in path_oephys_calibration.glob('*.h5') if str(f).endswith('medium.h5')]
     all_cells = []
-    for p in all_raw_paths:
-        path_output = path_base_output / p.parent.name
+    for p in all_paths_calibration:
+        cell_id = p.name.split('_')[0]
+        aux = [f for f in path_oephys_processed.rglob(cell_id + '*.h5')]
+        if len(aux) > 0:
+            path_processed = aux[0]
+        else:
+            path_processed = None
+        aux = [f for f in path_oephys_raw.rglob(cell_id + '*.h5')]
+        if len(aux) > 0:
+            path_raw = aux[0]
+        else:
+            path_raw = None
+        paths_tiff = [f for f in path_oephys_raw.rglob(cell_id + '*.tif')]
+        path_output = path_base_output / (cell_id + '.nwb')
         if not path_output.exists():
             path_output.mkdir()
         c = {
-            'id': p.stem,
+            'cell_id': cell_id,
             'group': p.parent.name,
-            'path_raw': p,
-            'paths_tiff': list(p.parent.glob(p.stem + '*.tif')),
-            'path_processed': [pp for pp in all_processed_paths if p.stem in str(pp)][0],
-            'path_output': path_output / (p.stem + '.nwb')
+            'path_raw': path_raw,
+            'paths_tiff': paths_tiff,
+            'path_processed': path_processed,
+            'path_output': path_output
         }
         all_cells.append(c)
 
@@ -43,7 +58,7 @@ def run_all(path_oephys, ids=None):
         aux_list = all_cells
 
     for c in aux_list:
-        print(f"Converting group {c['group']}, cell {c['id']}...")
+        print(f"Converting group {c['group']}, cell {c['cell_id']}...")
 
         # Set source paths
         source_paths = {
