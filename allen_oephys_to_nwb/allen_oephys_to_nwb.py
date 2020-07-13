@@ -231,8 +231,8 @@ class AllenOephysNWBConverter(NWBConverter):
 
     def add_spiking_data(self):
         """Add spiking data"""
-        with h5py.File(self.source_paths['path_processed'], 'r') as f:
-            spike_times = np.where(f['spk'][0])[0] * f['dte'][0]
+        with h5py.File(self.source_paths['path_calibration'], 'r') as f:
+            spike_times = f['sptimes'][:]  # np.where(f['sptimes'][0])[0] * f['dte'][0]
             self.nwbfile.add_unit(spike_times=spike_times)
 
     def add_trials(self):
