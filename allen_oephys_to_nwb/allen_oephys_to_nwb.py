@@ -74,20 +74,20 @@ class AllenOephysNWBConverter(NWBConverter):
         """Add raw / filtered membrane voltage data"""
 
         self._create_electrodes_ecephys()
-        with h5py.File(self.source_paths['path_processed'], 'r') as f:
+        with h5py.File(self.source_paths['path_calibration'], 'r') as f:
             electrode_table_region = self.nwbfile.create_electrode_table_region(
                 region=[0],
                 description='electrode'
             )
-            ecephys_rate = 1 / f['dte'][0]
+            ecephys_rate = 1 / np.array(f['dte'])
 
             for tr in trace:
-                if tr == 'raw':
-                    trace_data = np.squeeze(f['Vm'])
-                    trace_name = 'raw_membrane_voltage'
-                    description = 'raw voltage trace'
+                # if tr == 'raw':
+                #     trace_data = np.squeeze(f['Vm'])
+                #     trace_name = 'raw_membrane_voltage'
+                #     description = 'raw voltage trace'
                 if tr == 'filtered':
-                    trace_data = np.squeeze(f['Vmfd'])
+                    trace_data = np.squeeze(f['ephys_baseline_subtracted'])
                     trace_name = 'filtered_membrane_voltage'
                     description = 'voltage trace filtered between 250 Hz and 5 kHz'
                 electrical_series = ElectricalSeries(
@@ -168,21 +168,22 @@ class AllenOephysNWBConverter(NWBConverter):
             fl = Fluorescence(name=meta_fluorescence['name'])
             ophys_module.add(fl)
 
-            fluorescence_mean_trace = np.squeeze(f['f_cell'])
-            rt_region = plane_segmentation.create_roi_table_region(
-                description='unique cell ROI',
-                region=[0]
-            )
+            with h5py.File(self.source_paths['path_calibration'], 'r') as fc:
+                fluorescence_mean_trace = np.squeeze(fc['dff'])
+                rt_region = plane_segmentation.create_roi_table_region(
+                    description='unique cell ROI',
+                    region=[0]
+                )
 
-            imaging_rate = 1 / f['dto'][0]
-            fl.create_roi_response_series(
-                name=meta_fluorescence['roi_response_series'][0]['name'],
-                data=fluorescence_mean_trace,
-                rois=rt_region,
-                rate=imaging_rate,
-                starting_time=0.,
-                unit='no unit'
-            )
+                imaging_rate = 1 / np.array(fc['dto'])
+                fl.create_roi_response_series(
+                    name=meta_fluorescence['roi_response_series'][0]['name'],
+                    data=fluorescence_mean_trace,
+                    rois=rt_region,
+                    rate=imaging_rate,
+                    starting_time=0.,
+                    unit='no unit'
+                )
 
     def add_ophys_acquisition(self, link=True):
         """Add raw ophys data from tiff files"""

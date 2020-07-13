@@ -20,36 +20,33 @@ def run_all(path_oephys_calibration, path_oephys_processed, path_oephys_raw,
     path_oephys_calibration = Path(path_oephys_calibration)
     path_oephys_processed = Path(path_oephys_processed)
     path_oephys_raw = Path(path_oephys_raw)
+
+    # Output path
     if path_base_output is None:
         path_base_output = path_oephys_calibration / 'nwb_converted'
+    if not path_base_output.exists():
+        path_base_output.mkdir()
 
     all_paths_calibration = [f for f in path_oephys_calibration.glob('*.h5') if str(f).endswith('medium.h5')]
     all_cells = []
     for p in all_paths_calibration:
         cell_id = p.name.split('_')[0]
+        # Get only cell ids existing in processed directory
         aux = [f for f in path_oephys_processed.rglob(cell_id + '*.h5')]
         if len(aux) > 0:
             path_processed = aux[0]
-        else:
-            path_processed = None
-        aux = [f for f in path_oephys_raw.rglob(cell_id + '*.h5')]
-        if len(aux) > 0:
-            path_raw = aux[0]
-        else:
-            path_raw = None
-        paths_tiff = [f for f in path_oephys_raw.rglob(cell_id + '*.tif')]
-        path_output = path_base_output / (cell_id + '.nwb')
-        if not path_output.exists():
-            path_output.mkdir()
-        c = {
-            'cell_id': cell_id,
-            'group': p.parent.name,
-            'path_raw': path_raw,
-            'paths_tiff': paths_tiff,
-            'path_processed': path_processed,
-            'path_output': path_output
-        }
-        all_cells.append(c)
+            path_raw = [f for f in path_oephys_raw.rglob(cell_id + '*.h5')][0]
+            paths_tiff = [f for f in path_oephys_raw.rglob(cell_id + '*.tif')]
+            c = {
+                'cell_id': cell_id,
+                'group': path_raw.parent.name,
+                'path_calibration': p,
+                'path_raw': path_raw,
+                'paths_tiff': paths_tiff,
+                'path_processed': path_processed,
+                'path_output': path_base_output / (cell_id + '.nwb')
+            }
+            all_cells.append(c)
 
     # Runs conversion for each cell
     if isinstance(ids, list):
@@ -62,13 +59,14 @@ def run_all(path_oephys_calibration, path_oephys_processed, path_oephys_raw,
 
         # Set source paths
         source_paths = {
+            'path_calibration': c['path_calibration'],
             'path_raw': c['path_raw'],
             'paths_tiff': c['paths_tiff'],
             'path_processed': c['path_processed'],
         }
 
         # Load metadata from YAML file
-        metafile = 'metafile.yml'
+        metafile = Path.cwd() / 'metafile.yml'
         with open(metafile) as f:
             metadata = yaml.safe_load(f)
 
@@ -89,10 +87,10 @@ def run_all(path_oephys_calibration, path_oephys_processed, path_oephys_raw,
             converter.add_spiking_data()
 
             # Add Voltage traces, trace = ['raw', 'filtered']
-            converter.add_ecephys_acquisition(trace=['raw', 'filtered'])
+            converter.add_ecephys_acquisition(trace=['filtered'])
 
             # Add trials
-            converter.add_trials()
+            # converter.add_trials()
 
             # Save to file
             path_output = str(c['path_output'])
