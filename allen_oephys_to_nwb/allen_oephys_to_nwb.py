@@ -70,8 +70,8 @@ class AllenOephysNWBConverter(NWBConverter):
             group=electrode_group
         )
 
-    def add_ecephys_acquisition(self, trace=['raw', 'filtered']):
-        """Add raw / filtered membrane voltage data"""
+    def add_ecephys_processed(self):
+        """Add filtered membrane voltage data"""
 
         self._create_electrodes_ecephys()
         with h5py.File(self.source_paths['path_calibration'], 'r') as f:
@@ -81,24 +81,24 @@ class AllenOephysNWBConverter(NWBConverter):
             )
             ecephys_rate = 1 / np.array(f['dte'])
 
-            for tr in trace:
-                # if tr == 'raw':
-                #     trace_data = np.squeeze(f['Vm'])
-                #     trace_name = 'raw_membrane_voltage'
-                #     description = 'raw voltage trace'
-                if tr == 'filtered':
-                    trace_data = np.squeeze(f['ephys_baseline_subtracted'])
-                    trace_name = 'filtered_membrane_voltage'
-                    description = 'voltage trace filtered between 250 Hz and 5 kHz'
-                electrical_series = ElectricalSeries(
-                    name=trace_name,
-                    description=description,
-                    data=trace_data,
-                    electrodes=electrode_table_region,
-                    starting_time=0.,
-                    rate=ecephys_rate,
-                )
-                self.nwbfile.add_acquisition(electrical_series)
+            trace_data = np.squeeze(f['ephys_baseline_subtracted'])
+            trace_name = 'filtered_membrane_voltage'
+            description = 'voltage trace filtered between 250 Hz and 5 kHz'
+            electrical_series = ElectricalSeries(
+                name=trace_name,
+                description=description,
+                data=trace_data,
+                electrodes=electrode_table_region,
+                starting_time=0.,
+                rate=ecephys_rate,
+            )
+
+            # Stores processed data
+            ecephys_module = self.nwbfile.create_processing_module(
+                name='ecephys',
+                description='contains extracellular electrophysiology processed data'
+            )
+            ecephys_module.add(electrical_series)
 
     def _get_imaging_plane(self):
         """Add new / return existing Imaging Plane"""
@@ -147,10 +147,15 @@ class AllenOephysNWBConverter(NWBConverter):
             ophys_module.add(img_seg)
 
             meta_planeseg = meta_imgseg['plane_segmentations'][0]
+            if meta_planeseg['reference_images'] in self.nwbfile.acquisition:
+                reference_images = self.nwbfile.acquisition[meta_planeseg['reference_images']]
+            else:
+                reference_images = None
             plane_segmentation = img_seg.create_plane_segmentation(
                 name=meta_planeseg['name'],
                 description=meta_planeseg['description'],
                 imaging_plane=imaging_plane,
+                reference_images=reference_images,
             )
 
             # ROIs

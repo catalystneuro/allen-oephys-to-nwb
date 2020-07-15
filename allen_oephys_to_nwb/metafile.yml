@@ -29,6 +29,7 @@ Ophys:
       - name: plane_segmentation
         description: ADDME
         imaging_plane: imaging_plane
+        reference_images: raw_ophys
   ImagingPlane:
     - description: ADDME
       device: Bruker 2-p microscope

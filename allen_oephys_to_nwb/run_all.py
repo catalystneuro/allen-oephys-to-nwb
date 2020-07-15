@@ -77,17 +77,17 @@ def run_all(path_oephys_calibration, path_oephys_processed, path_oephys_raw,
         )
 
         if converter.valid:
-            # Add processed fluorescence data
-            converter.add_ophys_processed()
-
             # Add raw optophys data - Link to external TIF files or store raw data
             converter.add_ophys_acquisition(link=True)
+
+            # Add processed fluorescence data
+            converter.add_ophys_processed()
 
             # Add spiking data
             converter.add_spiking_data()
 
             # Add Voltage traces, trace = ['raw', 'filtered']
-            converter.add_ecephys_acquisition(trace=['filtered'])
+            converter.add_ecephys_processed()
 
             # Add trials
             # converter.add_trials()
