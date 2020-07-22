@@ -42,7 +42,7 @@ def run_all(path_oephys_calibration, path_oephys_processed, path_oephys_raw,
         if len(aux) > 0:
             path_processed = aux[0]
             path_raw = [f for f in path_oephys_raw.rglob(cell_id + '*.h5')][0]
-            paths_tiff = [f for f in path_oephys_raw.rglob(cell_id + '*.tif')]
+            paths_tiff = [f for f in path_oephys_raw.rglob(cell_id + '*_2.tif')]
             c = {
                 'cell_id': cell_id,
                 'group': path_raw.parent.name,
