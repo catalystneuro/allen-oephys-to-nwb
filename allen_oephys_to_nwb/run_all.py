@@ -4,37 +4,55 @@ import yaml
 import argparse
 
 
-def run_all(path_oephys, ids=None):
+def run_all(path_oephys_calibration, path_oephys_processed, path_oephys_raw,
+            path_base_output=None, ids=None):
     """
     Sweep all files in directory and set up paths for conversion
 
     Parameters:
     -----------
-    path_oephys : str, path
-        Root path containing raw_data and processed_data directories.
+    path_oephys_claibration : str, path
+        Path containing quality selected data.
+    path_oephys_processed : str, path
+        Path containing original processed data files and directories.
+    path_oephys_raw : str, path
+        Path containing original raw data files and directories.
+    path_base_output : str, path
+        Path where to store created nwb files.
     ids : list (optional)
         Runs conversion only for the specific ids (used only for testing)
     """
 
-    path_oephys = Path(path_oephys)
-    path_base_output = path_oephys / 'nwb_converted'
+    path_oephys_calibration = Path(path_oephys_calibration)
+    path_oephys_processed = Path(path_oephys_processed)
+    path_oephys_raw = Path(path_oephys_raw)
 
-    all_raw_paths = list((path_oephys / 'raw_data').rglob('*.h5'))
-    all_processed_paths = list((path_oephys / 'processed_data').rglob('*.h5'))
+    # Output path
+    if path_base_output is None:
+        path_base_output = path_oephys_calibration / 'nwb_converted'
+    if not path_base_output.exists():
+        path_base_output.mkdir()
+
+    all_paths_calibration = [f for f in path_oephys_calibration.glob('*.h5') if str(f).endswith('medium.h5')]
     all_cells = []
-    for p in all_raw_paths:
-        path_output = path_base_output / p.parent.name
-        if not path_output.exists():
-            path_output.mkdir()
-        c = {
-            'id': p.stem,
-            'group': p.parent.name,
-            'path_raw': p,
-            'paths_tiff': list(p.parent.glob(p.stem + '*.tif')),
-            'path_processed': [pp for pp in all_processed_paths if p.stem in str(pp)][0],
-            'path_output': path_output / (p.stem + '.nwb')
-        }
-        all_cells.append(c)
+    for p in all_paths_calibration:
+        cell_id = p.name.split('_')[0]
+        # Get only cell ids existing in processed directory
+        aux = [f for f in path_oephys_processed.rglob(cell_id + '*.h5')]
+        if len(aux) > 0:
+            path_processed = aux[0]
+            path_raw = [f for f in path_oephys_raw.rglob(cell_id + '*.h5')][0]
+            paths_tiff = [f for f in path_oephys_raw.rglob(cell_id + '*_2.tif')]
+            c = {
+                'cell_id': cell_id,
+                'group': path_raw.parent.name,
+                'path_calibration': p,
+                'path_raw': path_raw,
+                'paths_tiff': paths_tiff,
+                'path_processed': path_processed,
+                'path_output': path_base_output / (cell_id + '.nwb')
+            }
+            all_cells.append(c)
 
     # Runs conversion for each cell
     if isinstance(ids, list):
@@ -43,17 +61,18 @@ def run_all(path_oephys, ids=None):
         aux_list = all_cells
 
     for c in aux_list:
-        print(f"Converting group {c['group']}, cell {c['id']}...")
+        print(f"Converting group {c['group']}, cell {c['cell_id']}...")
 
         # Set source paths
         source_paths = {
+            'path_calibration': c['path_calibration'],
             'path_raw': c['path_raw'],
             'paths_tiff': c['paths_tiff'],
             'path_processed': c['path_processed'],
         }
 
         # Load metadata from YAML file
-        metafile = 'metafile.yml'
+        metafile = Path.cwd() / 'metafile.yml'
         with open(metafile) as f:
             metadata = yaml.safe_load(f)
 
@@ -64,20 +83,20 @@ def run_all(path_oephys, ids=None):
         )
 
         if converter.valid:
-            # Add processed fluorescence data
-            converter.add_ophys_processed()
-
             # Add raw optophys data - Link to external TIF files or store raw data
             converter.add_ophys_acquisition(link=True)
+
+            # Add processed fluorescence data
+            converter.add_ophys_processed()
 
             # Add spiking data
             converter.add_spiking_data()
 
             # Add Voltage traces, trace = ['raw', 'filtered']
-            converter.add_ecephys_acquisition(trace=['raw', 'filtered'])
+            converter.add_ecephys_processed()
 
             # Add trials
-            converter.add_trials()
+            # converter.add_trials()
 
             # Save to file
             path_output = str(c['path_output'])
@@ -90,8 +109,20 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser("Convert OEphys to NWB.")
 
     parser.add_argument(
-        "path_oephys",
-        help="The path to the root directory holding raw and processed data"
+        "path_oephys_calibration",
+        help="Path containing quality selected data."
+    )
+    parser.add_argument(
+        "path_oephys_processed",
+        help="Path containing original processed data files and directories."
+    )
+    parser.add_argument(
+        "path_oephys_raw",
+        help="Path containing original raw data files and directories."
+    )
+    parser.add_argument(
+        "path_base_output",
+        help="Path where to store created nwb files."
     )
     parser.add_argument(
         "--ids",
@@ -104,10 +135,19 @@ if __name__ == '__main__':
     else:
         args = parser.parse_args()
 
-    path_oephys = Path(args.path_oephys)
+    path_oephys_calibration = Path(args.path_oephys_calibration)
+    path_oephys_processed = Path(args.path_oephys_processed)
+    path_oephys_raw = Path(args.path_oephys_raw)
+    path_base_output = Path(args.path_oephys_output)
     if args.ids is not None:
         ids = [b.strip() for b in args.ids.split(',')]
     else:
         ids = None
 
-    run_all(path_oephys=path_oephys, ids=ids)
+    run_all(
+        path_oephys_calibration=path_oephys_calibration,
+        path_oephys_processed=path_oephys_processed,
+        path_oephys_raw=path_oephys_raw,
+        path_base_output=path_base_output,
+        ids=ids
+    )

@@ -3,7 +3,7 @@ NWBFile:
   identifier: ADDME
   institution: Allen Institute for Brain Science
   session_description: ADDME
-  session_start_time: 2018-08-09 10:00:00
+  session_start_time: 1900-01-01 00:00:00
 Subject:
   subject_id: ADDME
   genotype: ADDME
@@ -29,6 +29,7 @@ Ophys:
       - name: plane_segmentation
         description: ADDME
         imaging_plane: imaging_plane
+        reference_images: raw_ophys
   ImagingPlane:
     - description: ADDME
       device: Bruker 2-p microscope
