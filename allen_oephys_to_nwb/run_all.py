@@ -1,4 +1,5 @@
 from allen_oephys_to_nwb import AllenOephysNWBConverter
+from .zoom_pairs import zoom_pairs
 from pathlib import Path
 import yaml
 import argparse
@@ -43,11 +44,16 @@ def run_all(path_oephys_calibration, path_oephys_processed, path_oephys_raw,
             path_processed = aux[0]
             path_raw = [f for f in path_oephys_raw.rglob(cell_id + '*.h5')][0]
             paths_tiff = [f for f in path_oephys_raw.rglob(cell_id + '*_2.tif')]
+            paths_lowzoom = None
+            if cell_id in zoom_pairs:
+                lowzoom_id = zoom_pairs[cell_id]
+                paths_lowzoom = [f for f in path_oephys_raw.rglob(lowzoom_id + '*_2.tif')]
             c = {
                 'cell_id': cell_id,
                 'group': path_raw.parent.name,
                 'path_calibration': p,
                 'path_raw': path_raw,
+                'paths_tiff_lowzoom': paths_lowzoom,
                 'paths_tiff': paths_tiff,
                 'path_processed': path_processed,
                 'path_output': path_base_output / (cell_id + '.nwb')

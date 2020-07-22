@@ -1,16 +1,11 @@
 from datetime import datetime
-from dateutil.tz import tzlocal
-from pynwb import NWBFile, NWBHDF5IO
-from pynwb.file import Subject
 from pynwb.ophys import TwoPhotonSeries, OpticalChannel, Fluorescence, ImageSegmentation
 from pynwb.ecephys import ElectricalSeries
-from pynwb.device import Device
 from hdmf.data_utils import DataChunkIterator
 from nwb_conversion_tools import NWBConverter
 
 from .subjects_info import subjects_info
 
-from pathlib import Path
 from libtiff import TIFF
 from PIL import Image as pImage
 import numpy as np
