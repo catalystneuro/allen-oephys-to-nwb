@@ -92,7 +92,7 @@ def run_all(path_oephys_calibration, path_oephys_processed, path_oephys_raw,
             # Add spiking data
             converter.add_spiking_data()
 
-            # Add Voltage traces, trace = ['raw', 'filtered']
+            # Add Voltage traces
             converter.add_ecephys_processed()
 
             # Add trials
