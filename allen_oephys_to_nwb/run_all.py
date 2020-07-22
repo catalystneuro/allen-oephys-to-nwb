@@ -11,8 +11,14 @@ def run_all(path_oephys_calibration, path_oephys_processed, path_oephys_raw,
 
     Parameters:
     -----------
-    path_oephys : str, path
-        Root path containing raw_data and processed_data directories.
+    path_oephys_claibration : str, path
+        Path containing quality selected data.
+    path_oephys_processed : str, path
+        Path containing original processed data files and directories.
+    path_oephys_raw : str, path
+        Path containing original raw data files and directories.
+    path_base_output : str, path
+        Path where to store created nwb files.
     ids : list (optional)
         Runs conversion only for the specific ids (used only for testing)
     """
@@ -103,8 +109,20 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser("Convert OEphys to NWB.")
 
     parser.add_argument(
-        "path_oephys",
-        help="The path to the root directory holding raw and processed data"
+        "path_oephys_calibration",
+        help="Path containing quality selected data."
+    )
+    parser.add_argument(
+        "path_oephys_processed",
+        help="Path containing original processed data files and directories."
+    )
+    parser.add_argument(
+        "path_oephys_raw",
+        help="Path containing original raw data files and directories."
+    )
+    parser.add_argument(
+        "path_base_output",
+        help="Path where to store created nwb files."
     )
     parser.add_argument(
         "--ids",
@@ -117,10 +135,19 @@ if __name__ == '__main__':
     else:
         args = parser.parse_args()
 
-    path_oephys = Path(args.path_oephys)
+    path_oephys_calibration = Path(args.path_oephys_calibration)
+    path_oephys_processed = Path(args.path_oephys_processed)
+    path_oephys_raw = Path(args.path_oephys_raw)
+    path_base_output = Path(args.path_oephys_output)
     if args.ids is not None:
         ids = [b.strip() for b in args.ids.split(',')]
     else:
         ids = None
 
-    run_all(path_oephys=path_oephys, ids=ids)
+    run_all(
+        path_oephys_calibration=path_oephys_calibration,
+        path_oephys_processed=path_oephys_processed,
+        path_oephys_raw=path_oephys_raw,
+        path_base_output=path_base_output,
+        ids=ids
+    )
