@@ -1,0 +1,14 @@
+{
+	"source_data": {
+		"path_calibration": "path_to/calibration.h5",
+		"path_raw": "path_to/raw.h5",
+		"path_tiff": "path_to/image.tif",
+		"path_processed": "path_to/processed_data.h5"
+	},
+	"conversion_options": {
+		"ophys_raw": true,
+		"ophys_processed": true,
+		"ecephys_spiking": true,
+		"ecephys_processed": true
+	}
+}

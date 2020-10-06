@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "source.schema.json",
+  "title": "Source data and conversion options",
+  "description": "Schema for the source data and conversion options",
+  "version": "0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+
+    "source_data": {
+      "title": "Source Files",
+      "type": "object",
+      "required": [
+        "path_calibration",
+        "path_raw",
+        "paths_tiff",
+        "path_processed"
+      ],
+      "properties": {
+        "path_calibration": {
+          "type": "string",
+          "format": "file",
+          "description": "path to calibration data file"
+        },
+        "path_raw": {
+          "type": "string",
+          "format": "file",
+          "description": "path to raw data file"
+        },
+        "path_tiff": {
+          "type": "string",
+          "format": "file",
+          "description": "path to tiff data file"
+        },
+        "path_processed": {
+          "type": "string",
+          "format": "file",
+          "description": "path to processed data file"
+        }
+      }
+    },
+
+    "conversion_options": {
+      "title": "Conversion Options",
+      "type": "object",
+      "required": [
+        "ophys_raw",
+        "ophys_processed",
+        "ecephys_spiking",
+        "ecephys_processed"
+      ],
+      "properties": {
+        "ophys_raw": {
+          "type": "boolean",
+          "default": true,
+          "description": "convert raw ophys data to nwb"
+        },
+        "ophys_processed": {
+          "type": "boolean",
+          "default": true,
+          "description": "convert processed ophys data to nwb"
+        },
+        "ecephys_spiking": {
+          "type": "boolean",
+          "default": true,
+          "description": "convert spiking data to nwb"
+        },
+        "ecephys_processed": {
+          "type": "boolean",
+          "default": true,
+          "description": "convert ecephys processed data to nwb"
+        }
+      }
+    }
+  }
+}
