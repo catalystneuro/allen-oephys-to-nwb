@@ -37,6 +37,11 @@
           "type": "string",
           "format": "file",
           "description": "path to processed data file"
+        },
+        "subjects_info": {
+          "type": "string",
+          "format": "file",
+          "description": "path to subjects info data file"
         }
       }
     },

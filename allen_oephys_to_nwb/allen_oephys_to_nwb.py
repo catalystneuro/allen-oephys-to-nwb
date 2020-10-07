@@ -1,11 +1,8 @@
 from datetime import datetime
-from pynwb import NWBFile
-from pynwb.file import Subject
 from pynwb.ophys import TwoPhotonSeries, OpticalChannel, Fluorescence, ImageSegmentation
 from pynwb.ecephys import ElectricalSeries
 from hdmf.data_utils import DataChunkIterator
 from nwb_conversion_tools import NWBConverter
-from nwb_conversion_tools.utils import get_schema_from_hdmf_class, get_root_schema
 
 from .subjects_info import subjects_info
 from .allen_ophys_interface import AllenOphysInterface
@@ -15,16 +12,6 @@ from libtiff import TIFF
 from PIL import Image as pImage
 import numpy as np
 import h5py
-import collections.abc
-
-
-def dict_deep_update(d, u):
-    for k, v in u.items():
-        if isinstance(v, collections.abc.Mapping):
-            d[k] = dict_deep_update(d.get(k, {}), v)
-        else:
-            d[k] = v
-    return d
 
 
 class AllenOephysNWBConverter(NWBConverter):
@@ -38,22 +25,7 @@ class AllenOephysNWBConverter(NWBConverter):
     def __init__(self, input_data):
         super().__init__(**input_data)
 
-    def get_metadata_schema(self):
-        """Compile metadata schemas from each of the data interface objects."""
-        metadata_schema = get_root_schema()
-        metadata_schema['properties'] = dict(
-            NWBFile=get_schema_from_hdmf_class(NWBFile),
-            Subject=get_schema_from_hdmf_class(Subject)
-        )
-        for name, data_interface in self.data_interface_objects.items():
-            this_schema = data_interface.get_metadata_schema()
-            metadata_schema['properties'].update({name: this_schema['properties']})
-            for field in this_schema['required']:
-                metadata_schema['required'].append(field)
-
-        return metadata_schema
-
-    def run_conversion(self, source_paths, metadata=None, nwbfile=None):
+    def run_conversion_old(self, source_paths, metadata=None, nwbfile=None):
 
         raise NotImplementedError('This is the old code, needs to be refactored into the new converter')
 

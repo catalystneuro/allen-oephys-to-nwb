@@ -1,5 +1,6 @@
 from nwb_conversion_tools.basedatainterface import BaseDataInterface
 from nwb_conversion_tools.utils import get_schema_from_hdmf_class, get_base_schema
+from pynwb import NWBFile
 
 
 class AllenOphysInterface(BaseDataInterface):
@@ -14,7 +15,8 @@ class AllenOphysInterface(BaseDataInterface):
                     'path_calibration',
                     'path_raw',
                     'paths_tiff',
-                    'path_processed'
+                    'path_processed',
+                    'subjects_info'
                 ],
                 "properties": {}
             },
@@ -49,6 +51,11 @@ class AllenOphysInterface(BaseDataInterface):
             "format": "file",
             "description": "path to processed data file"
         }
+        input_schema['source_data']['properties']['subjects_info'] = {
+            "type": "string",
+            "format": "file",
+            "description": "path to subjects info data file"
+        }
         # Conversion options
         input_schema['conversion_options']['properties']['ophys_raw'] = {
             "type": "boolean",
@@ -69,12 +76,15 @@ class AllenOphysInterface(BaseDataInterface):
         metadata_schema = get_base_schema()
 
         metadata_schema['properties']['Ophys'] = dict()
-        # get_schema_from_hdmf_class(SpatialSeries)
-        # required_fields = ['SpatialSeries']
-        # for field in required_fields:
-        #     metadata_schema['required'].append(field)
 
         return metadata_schema
 
-    def convert_data(self):
-        raise NotImplementedError('TODO')
+    def get_metadata(self):
+        """Auto-fill as much of the metadata as possible."""
+        metadata = dict()
+        return metadata
+
+    def convert_data(self, nwbfile: NWBFile, metadata_dict: dict,
+                     stub_test: bool = False):
+        print(nwbfile)
+        # raise NotImplementedError('TODO')

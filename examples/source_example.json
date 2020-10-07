@@ -3,7 +3,8 @@
 		"path_calibration": "path_to/calibration.h5",
 		"path_raw": "path_to/raw.h5",
 		"path_tiff": "path_to/image.tif",
-		"path_processed": "path_to/processed_data.h5"
+		"path_processed": "path_to/processed_data.h5",
+		"subjects_info": "path/to.json"
 	},
 	"conversion_options": {
 		"ophys_raw": true,
