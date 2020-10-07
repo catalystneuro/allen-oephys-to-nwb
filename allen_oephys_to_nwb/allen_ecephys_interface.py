@@ -99,7 +99,7 @@ class AllenEcephysInterface(BaseDataInterface):
                 print(f"File {self.input_args['source_data']['path_processed']} does not have 'aid' key. Skipping it...")
                 subject_info = {
                     'subject_id': '',
-                    'genotype': '',
+                    'line': '',
                     'age': '',
                     'anesthesia': ''
                 }
