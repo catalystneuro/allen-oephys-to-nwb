@@ -8,16 +8,17 @@ pp = pprint.PrettyPrinter(depth=6)
 source_path = Path(r'D:\Dropbox\oephys_calibration_dataset_from_the_allen_institute')
 input_data = {
     "source_data": {
-        "path_calibration": source_path / "calibration.h5",
-        "path_raw": source_path / "raw.h5",
-        "path_tiff": source_path / "image.tif",
-        "path_processed": source_path / "oephys_dataset_original/processed_data/Cux2-f_highzoom/103703_processed.h5",
+        "path_calibration": source_path / "102086.h5",
+        "path_raw": source_path / "oephys_dataset_original/raw_data/Emx1-s_highzoom/102086.h5",
+        "path_tiff": "oephys_dataset_original/raw_data/Emx1-s_highzoom/102086_2.tif",
+        "path_processed": source_path / 'oephys_dataset_original/processed_data/Emx1-s_highzoom/102086_processed.h5',
         "subjects_info": source_path / "subjects_info.json"
     },
     "conversion_options": {
         "ophys_raw": True,
         "ophys_processed": True,
         "ecephys_spiking": True,
+        "ecephys_raw": True,
         "ecephys_processed": True
     }
 }

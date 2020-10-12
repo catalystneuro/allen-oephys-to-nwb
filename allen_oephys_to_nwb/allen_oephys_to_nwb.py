@@ -18,7 +18,7 @@ class AllenOephysNWBConverter(NWBConverter):
 
     # Modular data interfaces
     data_interface_classes = {
-        'AllenOphys': AllenOphysInterface,
+        # 'AllenOphys': AllenOphysInterface,
         'AllenEcephys': AllenEcephysInterface,
     }
 
