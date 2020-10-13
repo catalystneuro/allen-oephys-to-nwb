@@ -46,7 +46,7 @@ class TimeControllerComponent(html.Div):
                     ),
                     dbc.Row(
                         dbc.Col(
-                            self.slider_start,
+                            self.slider_start, 
                             width={'size': 12},
                         )
                     )
@@ -73,7 +73,7 @@ class TimeControllerComponent(html.Div):
                 [
                     dbc.Row(
                         dbc.Col(
-                            dbc.Label('duration (s):'),
+                            dbc.Label('duration (s):'), 
                             width={'size': 12}
                         )
                     ),
@@ -176,7 +176,7 @@ class TiffImageSeriesGraphComponent(dcc.Graph):
                 z=self.image,
                 colorscale='gray',
                 showscale=False,
-            )
+            ), 
         )
         self.out_fig.update_layout(
             xaxis=go.layout.XAxis(showticklabels=False, ticks=""),
@@ -184,6 +184,7 @@ class TiffImageSeriesGraphComponent(dcc.Graph):
         )
 
         self.figure = self.out_fig
+
 
     def update_image(self, pos, nwb, relative_path):
         """Update tiff image frame"""
@@ -208,6 +209,18 @@ class TiffImageSeriesGraphComponent(dcc.Graph):
         self.image = imread(path_external_file, key=frame_number)
         self.out_fig.data[0].z = self.image
 
+        self.out_fig.update_layout(
+            autosize=False,
+            margin=dict(
+                l=0,
+                r=0,
+                b=10,
+                t=0,
+                pad=0
+            ),
+            height=380
+        )
+
     def update_pixelmask(self):
         """ Update pixel mask on self figure """
 
@@ -229,7 +242,7 @@ class TiffImageSeriesGraphComponent(dcc.Graph):
                 self.out_fig.data[1].y = self.mask_y_coords
 
 
-class AllenOephysDashboard(html.Div):
+class AllenDashboard(html.Div):
     """Dashboard built with Dash version of NWB widgets"""
     def __init__(self, parent_app, path_nwb=None):
         super().__init__([])
@@ -260,8 +273,8 @@ class AllenOephysDashboard(html.Div):
                     dbc.Col(
                         id='div-controller',
                         children= dbc.Card(
-                            self.controller_time,
-                            style={'margin-bottom': '10px', 'max-height': '95px'}
+                            self.controller_time, 
+                            style={'margin-bottom': '10px', 'max-height': '75px'}
                         ),
                         style={'display': 'none'},
                         width={'size': 12},
@@ -292,7 +305,7 @@ class AllenOephysDashboard(html.Div):
                         width={'size': 4}
                     ),
                 ]),
-            ])
+            ], style={'min-width': '80vw'})
         ]
 
         self.style = {'background-color': '#f0f0f0', 'min-height': '100vh'}
@@ -363,9 +376,9 @@ class AllenOephysDashboard(html.Div):
 
         @self.parent_app.callback(
             [
-                Output('button_file_browser_allen-dash', 'n_clicks'),
-                Output('slider_start_time', 'value'),
-                Output('div-controller', 'style'),
+                Output('button_file_browser_allen-dash', 'n_clicks'), 
+                Output('slider_start_time', 'value'), 
+                Output('div-controller', 'style'), 
                 Output('div-photon-series', 'children'),
                 Output('external-update-max-time-trigger', 'children')
             ],
@@ -485,10 +498,15 @@ class AllenOephysDashboard(html.Div):
         })
         self.traces.update_yaxes(title_text="Ephys [V]", row=1, col=1)
         self.traces.update_yaxes(title_text="dF/F", row=3, col=1)
+        
         self.traces.update_yaxes(patch={
-            "title_text": "Spikes",
-            "showticklabels": False,
-            "ticks": ""},
+            "title": {"text": "Spikes", "font": {"color": "black"}},
+            "showticklabels": True,
+            "ticks": "outside",
+            "tickcolor": "white",
+            "color": "white",
+
+            },
             row=2, col=1
         )
 
