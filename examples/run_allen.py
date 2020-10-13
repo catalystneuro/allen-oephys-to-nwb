@@ -5,14 +5,14 @@ import pprint
 
 pp = pprint.PrettyPrinter(depth=6)
 
-source_path = Path(r'D:\Dropbox\oephys_calibration_dataset_from_the_allen_institute')
+source_path = Path(r'C:\Users\Luiz\Desktop\data_allen')
 input_data = {
     "source_data": {
-        "path_calibration": source_path / "102086.h5",
         "path_raw": source_path / "oephys_dataset_original/raw_data/Emx1-s_highzoom/102086.h5",
-        "path_tiff": "oephys_dataset_original/raw_data/Emx1-s_highzoom/102086_2.tif",
-        "path_processed": source_path / 'oephys_dataset_original/processed_data/Emx1-s_highzoom/102086_processed.h5',
-        "subjects_info": source_path / "subjects_info.json"
+        # "path_subjects_info": source_path / "subjects_info.json",
+        # "path_calibration": source_path / "102086.h5",
+        # "path_tiff": "oephys_dataset_original/raw_data/Emx1-s_highzoom/102086_2.tif",
+        # "path_processed": source_path / 'oephys_dataset_original/processed_data/Emx1-s_highzoom/102086_processed.h5',
     },
     "conversion_options": {
         "ophys_raw": True,

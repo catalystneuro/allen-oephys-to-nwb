@@ -3,9 +3,11 @@ from nwb_conversion_tools.utils import get_base_schema, get_schema_from_hdmf_cla
 import pynwb
 from pynwb import NWBFile
 from datetime import datetime
+from pathlib import Path
 import numpy as np
 import h5py
 import json
+import uuid
 
 
 class AllenEcephysInterface(BaseDataInterface):
@@ -17,11 +19,10 @@ class AllenEcephysInterface(BaseDataInterface):
                 "title": "Source Files",
                 "type": "object",
                 "required": [
-                    # 'path_calibration',
                     'path_raw',
+                    # 'path_calibration',
                     # 'paths_tiff',
-                    # 'path_processed',
-                    # 'subjects_info'
+                    # 'path_processed'
                 ],
                 "properties": {}
             },
@@ -29,6 +30,7 @@ class AllenEcephysInterface(BaseDataInterface):
                 "title": "Conversion options",
                 "type": "object",
                 "required": [
+                    "ecephys_raw",
                     "ecephys_spiking",
                     "ecephys_processed"
                 ],
@@ -40,6 +42,11 @@ class AllenEcephysInterface(BaseDataInterface):
             "type": "string",
             "format": "file",
             "description": "path to raw data file"
+        }
+        input_schema['source_data']['properties']['path_subjects_info'] = {
+            "type": "string",
+            "format": "file",
+            "description": "path to subjects info data file"
         }
         # input_schema['source_data']['properties']['path_calibration'] = {
         #     "type": "string",
@@ -56,22 +63,22 @@ class AllenEcephysInterface(BaseDataInterface):
         #     "format": "file",
         #     "description": "path to processed data file"
         # }
-        # input_schema['source_data']['properties']['subjects_info'] = {
-        #     "type": "string",
-        #     "format": "file",
-        #     "description": "path to subjects info data file"
-        # }
 
         # Conversion options
-        input_schema['conversion_options']['properties']['ecephys_spiking'] = {
+        input_schema['conversion_options']['properties']['ecephys_raw'] = {
             "type": "boolean",
             "default": True,
-            "description": "convert spiking data to nwb"
+            "description": "convert ecephys raw data to nwb"
         }
         input_schema['conversion_options']['properties']['ecephys_processed'] = {
             "type": "boolean",
             "default": True,
             "description": "convert ecephys processed data to nwb"
+        }
+        input_schema['conversion_options']['properties']['ecephys_spiking'] = {
+            "type": "boolean",
+            "default": True,
+            "description": "convert spiking data to nwb"
         }
         return input_schema
 
@@ -91,27 +98,29 @@ class AllenEcephysInterface(BaseDataInterface):
         """Auto-fill as much of the metadata as possible."""
         metadata = dict()
 
-        return metadata
-
         # Get metadata info from files
-        subjects_info_path = self.input_args['source_data']['subjects_info']
-        with open(subjects_info_path, 'r') as inp:
-            subjects_info = json.load(inp)
+        subjects_info_path = self.input_args['source_data']['path_subjects_info']
+        if Path(subjects_info_path).is_file():
+            with open(subjects_info_path, 'r') as inp:
+                subjects_info = json.load(inp)
 
-        with h5py.File(self.input_args['source_data']['path_processed'], 'r') as f:
-            session_identifier = str(int(f['tid'][0]))
-            if np.isnan(f['aid'][0]):
-                print(f"File {self.input_args['source_data']['path_processed']} does not have 'aid' key. Skipping it...")
-                subject_info = {
-                    'subject_id': '',
-                    'line': '',
-                    'age': '',
-                    'anesthesia': ''
-                }
-            else:
-                subject_id = str(int(f['aid'][0]))
-                subject_info = subjects_info[subject_id]
-                subject_info['subject_id'] = subject_id
+        subject_info = {
+            'subject_id': '',
+            'line': '',
+            'age': '',
+            'anesthesia': ''
+        }
+
+        session_identifier = str(uuid.uuid4())
+        if 'path_processed' in self.input_args['source_data']:
+            with h5py.File(self.input_args['source_data']['path_processed'], 'r') as f:
+                session_identifier = str(int(f['tid'][0]))
+                if np.isnan(f['aid'][0]):
+                    print(f"File {self.input_args['source_data']['path_processed']} does not have 'aid' key. Skipping it...")
+                else:
+                    subject_id = str(int(f['aid'][0]))
+                    subject_info = subjects_info[subject_id]
+                    subject_info['subject_id'] = subject_id
 
         # File metadata
         metadata['NWBFile'] = {
@@ -130,21 +139,19 @@ class AllenEcephysInterface(BaseDataInterface):
 
         # Ecephys metadata
         metadata['Ecephys'] = dict()
-        metadata['Ecephys']['Device'] = {
+        metadata['Ecephys']['Device_1'] = {
             'name': 'Device_ecephys'
         }
 
-        metadata['Ecephys']['ElectrodeGroup'] = [
-            {
-                'name': 'ElectrodeGroup',
-                'description': 'no description',
-                'location': '',
-                'device': 'Device_ecephys'
-            }
-        ]
+        metadata['Ecephys']['ElectrodeGroup'] = {
+            'name': 'ElectrodeGroup',
+            'description': 'no description',
+            'location': '',
+            'device': 'Device_ecephys'
+        }
 
         # Raw electrical series metadata
-        path_raw = self.input_args["source_data"]["path_raw"]
+        path_raw = Path(self.input_args["source_data"]["path_raw"])
         with h5py.File(path_raw, 'r') as f:
             ecephys_rate = 1 / np.array(f['dte'])
         metadata['Ecephys']['ElectricalSeries_raw'] = {
@@ -156,10 +163,16 @@ class AllenEcephysInterface(BaseDataInterface):
 
     def convert_data(self, nwbfile: NWBFile, metadata_dict: dict,
                      stub_test: bool = False):
-        print(nwbfile)
-        # raise NotImplementedError('TODO')
+        self.nwbfile = nwbfile
 
-    def create_electrode_groups(self, metadata_ecephys):
+        # ElectrodeGroups
+        self._create_electrode_groups(metadata_dict['Ecephys'])
+        # Electrodes
+        self._create_electrodes()
+        # Raw ecephys
+        self._create_raw_ecephys(metadata_dict['Ecephys'])
+
+    def _create_electrode_groups(self, metadata_ecephys):
         """
         Use metadata to create ElectrodeGroup object(s) in the NWBFile
 
@@ -170,7 +183,8 @@ class AllenEcephysInterface(BaseDataInterface):
             ElectrodeGroup belongs. This should contain keys for required groups
             such as 'Device', 'ElectrodeGroup', etc.
         """
-        for metadata_elec_group in metadata_ecephys['ElectrodeGroup']:
+        for key in [k for k in metadata_ecephys if 'ElectrodeGroup' in k]:
+            metadata_elec_group = metadata_ecephys[key]
             eg_name = metadata_elec_group['name']
             # Tests if ElectrodeGroup already exists
             aux = [i.name == eg_name for i in self.nwbfile.children]
@@ -193,7 +207,7 @@ class AllenEcephysInterface(BaseDataInterface):
                     description=eg_description
                 )
 
-    def _create_electrodes_ecephys(self):
+    def _create_electrodes(self):
         """Add electrode"""
         electrode_group = list(self.nwbfile.electrode_groups.values())[0]
         self.nwbfile.add_electrode(
@@ -205,7 +219,7 @@ class AllenEcephysInterface(BaseDataInterface):
             group=electrode_group
         )
 
-    def add_ecephys_raw(self):
+    def _create_raw_ecephys(self, metadata_ecephys):
         """Add raw membrane voltage data"""
         self._create_electrodes_ecephys()
         path_raw = self.input_args["source_data"]["path_raw"]
@@ -214,11 +228,11 @@ class AllenEcephysInterface(BaseDataInterface):
                 region=[0],
                 description='electrode'
             )
-            ecephys_rate = 1 / np.array(f['dte'])
 
             trace_data = np.squeeze(f['Voltage'])
-            trace_name = 'raw_ecephys'
-            description = 'Raw voltage trace'
+            trace_name = metadata_ecephys['ElectricalSeries_raw']['trace_name']
+            description = metadata_ecephys['ElectricalSeries_raw']['description']
+            ecephys_rate = metadata_ecephys['ElectricalSeries_raw']['rate']
             electrical_series = pynwb.ecephys.ElectricalSeries(
                 name=trace_name,
                 description=description,
