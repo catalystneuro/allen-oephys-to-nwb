@@ -131,24 +131,22 @@ class AllenEcephysInterface(BaseDataInterface):
         }
 
         # Subject metadata
-        metadata['Subject'] = {
-            'subject_id': subject_info['subject_id'],
-            'genotype': subject_info['line'],
-            'age': subject_info['age']
-        }
-
-        # Ecephys metadata
-        metadata['Ecephys'] = dict()
-        metadata['Ecephys']['Device_1'] = {
-            'name': 'Device_ecephys'
-        }
-
-        metadata['Ecephys']['ElectrodeGroup'] = {
-            'name': 'ElectrodeGroup',
-            'description': 'no description',
-            'location': '',
-            'device': 'Device_ecephys'
-        }
+        metadata = dict(
+            Subject=dict(
+                subject_id=subject_info['subject_id'],
+                genotype=subject_info['line'],
+                age=subject_info['age']
+            ),
+            Ecephys=dict(
+                Device=dict(name='Device_ecephys'),
+                ElectrodeGroup=dict(
+                    name='ElectrodeGroup',
+                    description='no description',
+                    location='unknown',
+                    device='Device_ecephys'
+                )
+            )
+        )
 
         # Raw electrical series metadata
         path_raw = Path(self.input_args["source_data"]["path_raw"])
