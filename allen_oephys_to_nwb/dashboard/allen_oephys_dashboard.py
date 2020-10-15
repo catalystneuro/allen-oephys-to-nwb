@@ -13,8 +13,8 @@ import dash
 from pathlib import Path
 import pynwb
 from nwb_web_gui.dashapps.utils.make_components import FileBrowserComponent
-from components.time_controller import TimeControllerComponent
-from components.tiff_component import TiffImageSeriesComponent
+from .components.time_controller import TimeControllerComponent
+from .components.tiff_component import TiffImageSeriesComponent
 
 
 class AllenDashboard(html.Div):
