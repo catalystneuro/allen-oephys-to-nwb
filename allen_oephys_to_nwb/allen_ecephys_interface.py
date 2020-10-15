@@ -14,72 +14,8 @@ class AllenEcephysInterface(BaseDataInterface):
 
     @classmethod
     def get_input_schema(cls):
-        input_schema = {
-            'source_data': {
-                "title": "Source Files",
-                "type": "object",
-                "required": [
-                    'path_raw',
-                    # 'path_calibration',
-                    # 'paths_tiff',
-                    # 'path_processed'
-                ],
-                "properties": {}
-            },
-            'conversion_options': {
-                "title": "Conversion options",
-                "type": "object",
-                "required": [
-                    "ecephys_raw",
-                    "ecephys_spiking",
-                    "ecephys_processed"
-                ],
-                "properties": {}
-            },
-        }
-        # Source files
-        input_schema['source_data']['properties']['path_raw'] = {
-            "type": "string",
-            "format": "file",
-            "description": "path to raw data file"
-        }
-        input_schema['source_data']['properties']['path_subjects_info'] = {
-            "type": "string",
-            "format": "file",
-            "description": "path to subjects info data file"
-        }
-        # input_schema['source_data']['properties']['path_calibration'] = {
-        #     "type": "string",
-        #     "format": "file",
-        #     "description": "path to calibration data file"
-        # }
-        # input_schema['source_data']['properties']['path_tiff'] = {
-        #     "type": "string",
-        #     "format": "file",
-        #     "description": "path to tiff data file"
-        # }
-        # input_schema['source_data']['properties']['path_processed'] = {
-        #     "type": "string",
-        #     "format": "file",
-        #     "description": "path to processed data file"
-        # }
-
-        # Conversion options
-        input_schema['conversion_options']['properties']['ecephys_raw'] = {
-            "type": "boolean",
-            "default": True,
-            "description": "convert ecephys raw data to nwb"
-        }
-        input_schema['conversion_options']['properties']['ecephys_processed'] = {
-            "type": "boolean",
-            "default": True,
-            "description": "convert ecephys processed data to nwb"
-        }
-        input_schema['conversion_options']['properties']['ecephys_spiking'] = {
-            "type": "boolean",
-            "default": True,
-            "description": "convert spiking data to nwb"
-        }
+        with open('source_schema.json') as f:
+            input_schema = json.load(f)
         return input_schema
 
     def __init__(self, **input_args):
@@ -122,33 +58,29 @@ class AllenEcephysInterface(BaseDataInterface):
                     subject_info = subjects_info[subject_id]
                     subject_info['subject_id'] = subject_id
 
-        # File metadata
-        metadata['NWBFile'] = {
-            'session_description': 'session description',
-            'identifier': session_identifier,
-            'session_start_time': datetime.strptime('1900-01-01 00:00:00', '%Y-%m-%d %H:%M:%S'),
-            'pharmacology': subject_info['anesthesia'],
-        }
-
-        # Subject metadata
-        metadata['Subject'] = {
-            'subject_id': subject_info['subject_id'],
-            'genotype': subject_info['line'],
-            'age': subject_info['age']
-        }
-
-        # Ecephys metadata
-        metadata['Ecephys'] = dict()
-        metadata['Ecephys']['Device_1'] = {
-            'name': 'Device_ecephys'
-        }
-
-        metadata['Ecephys']['ElectrodeGroup'] = {
-            'name': 'ElectrodeGroup',
-            'description': 'no description',
-            'location': '',
-            'device': 'Device_ecephys'
-        }
+        # initiate metadata
+        metadata = dict(
+            NWBFile=dict(
+                session_description='session description',
+                identifier=session_identifier,
+                session_start_time=datetime.strptime('1900-01-01 00:00:00', '%Y-%m-%d %H:%M:%S'),
+                pharmacology=subject_info['anesthesia'],
+            ),
+            Subject=dict(
+                subject_id=subject_info['subject_id'],
+                genotype=subject_info['line'],
+                age=subject_info['age']
+            ),
+            Ecephys=dict(
+                Device=dict(name='Device_ecephys'),
+                ElectrodeGroup=dict(
+                    name='ElectrodeGroup',
+                    description='no description',
+                    location='unknown',
+                    device='Device_ecephys'
+                )
+            )
+        )
 
         # Raw electrical series metadata
         path_raw = Path(self.input_args["source_data"]["path_raw"])
