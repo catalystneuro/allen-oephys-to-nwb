@@ -26,8 +26,7 @@ class AllenEcephysInterface(BaseDataInterface):
     def get_metadata_schema(self):
         metadata_schema = get_base_schema()
         metadata_schema['properties']['Ecephys'] = get_base_schema(tag='Ecephys')
-        metadata_schema['properties']['Ecephys']['properties']['Device_1'] = get_schema_from_hdmf_class(pynwb.device.Device)
-        metadata_schema['properties']['Ecephys']['properties']['Device_2'] = get_schema_from_hdmf_class(pynwb.device.Device)
+        metadata_schema['properties']['Ecephys']['properties']['Device'] = get_schema_from_hdmf_class(pynwb.device.Device)
         metadata_schema['properties']['Ecephys']['properties']['ElectrodeGroup'] = get_schema_from_hdmf_class(pynwb.ecephys.ElectrodeGroup)
         metadata_schema['properties']['Ecephys']['properties']['ElectricalSeries_raw'] = get_schema_from_hdmf_class(pynwb.ecephys.ElectricalSeries)
         return metadata_schema
@@ -38,6 +37,8 @@ class AllenEcephysInterface(BaseDataInterface):
 
         # Get metadata info from files
         subjects_info_path = self.input_args['source_data']['path_subjects_info']
+        print(Path(subjects_info_path).is_file())
+
         if Path(subjects_info_path).is_file():
             with open(subjects_info_path, 'r') as inp:
                 subjects_info = json.load(inp)

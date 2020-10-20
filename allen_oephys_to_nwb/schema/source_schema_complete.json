@@ -26,6 +26,16 @@
           "format": "file",
           "description": "path to tiff data file"
         },
+        "path_calibration": {
+          "type": "string",
+          "format": "file",
+          "description": "path to calibration data file"
+        },
+        "path_processed": {
+          "type": "string",
+          "format": "file",
+          "description": "path to processed data file"
+        },
         "path_subjects_info": {
           "type": "string",
           "format": "file",
