@@ -13,4 +13,5 @@ class ConfigDev(Config):
     TESTING = True
     DATABASE_URI = 'DEV_DATABASE_URI'
 
-    DATA_PATH = '/home/vinicius/Área de Trabalho/Trabalhos/allen-to-nwb/files/'
+    # DATA_PATH = '/home/vinicius/Área de Trabalho/Trabalhos/allen-to-nwb/files/'
+    DATA_PATH = r'D:\Dropbox\oephys_calibration_dataset_from_the_allen_institute'

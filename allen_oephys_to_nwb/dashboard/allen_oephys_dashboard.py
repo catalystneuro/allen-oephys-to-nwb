@@ -47,7 +47,7 @@ class AllenDashboard(html.Div):
                     dbc.Col(
                         id='div-controller',
                         children= dbc.Card(
-                            self.controller_time, 
+                            self.controller_time,
                             style={'margin-bottom': '10px', 'max-height': '75px'}
                         ),
                         style={'display': 'none'},
@@ -156,9 +156,9 @@ class AllenDashboard(html.Div):
 
         @self.parent_app.callback(
             [
-                Output('button_file_browser_allen-dash', 'n_clicks'), 
-                Output('slider_start_time', 'value'), 
-                Output('div-controller', 'style'), 
+                Output('button_file_browser_allen-dash', 'n_clicks'),
+                Output('slider_start_time', 'value'),
+                Output('div-controller', 'style'),
                 Output('div-photon-series', 'children'),
                 Output('external-update-max-time-trigger', 'children')
             ],
