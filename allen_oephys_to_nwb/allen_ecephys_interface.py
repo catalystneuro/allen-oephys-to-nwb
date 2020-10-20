@@ -1,9 +1,11 @@
 from nwb_conversion_tools.basedatainterface import BaseDataInterface
 from nwb_conversion_tools.utils import get_base_schema, get_schema_from_hdmf_class
+from . import schema
 import pynwb
 from pynwb import NWBFile
 from datetime import datetime
 from pathlib import Path
+import importlib.resources as pkg_resources
 import numpy as np
 import h5py
 import json
@@ -14,9 +16,9 @@ class AllenEcephysInterface(BaseDataInterface):
 
     @classmethod
     def get_input_schema(cls):
-        with open('source_schema.json') as f:
+        with pkg_resources.open_text(schema, 'source_schema.json') as f:
             input_schema = json.load(f)
-        return input_schema
+        return input_schema['properties']
 
     def __init__(self, **input_args):
         super().__init__(**input_args)
