@@ -26,7 +26,7 @@ class TiffImageSeriesComponent(html.Div):
                         self.graph,
                         self.pixelmask_btn
                     ], style={'justify-content': 'center', 'text-align': 'center'}),
-                ]),
+                ], style={'box-shadow': "4px 4px 4px 2px lightgrey"}),
                 width={'size': 12},
             ),
         ])
@@ -78,6 +78,14 @@ class TiffImageSeriesGraphComponent(dcc.Graph):
         self.out_fig.update_layout(
             xaxis=go.layout.XAxis(showticklabels=False, ticks=""),
             yaxis=go.layout.YAxis(showticklabels=False, ticks=""),
+            margin=dict(
+                l=0,
+                r=0,
+                b=10,
+                t=0,
+                pad=0
+            ),
+            height=380,
         )
 
         self.figure = self.out_fig
@@ -116,7 +124,6 @@ class TiffImageSeriesGraphComponent(dcc.Graph):
                 pad=0
             ),
             height=380,
-            
         )
 
     def update_pixelmask(self):

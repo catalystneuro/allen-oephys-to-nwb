@@ -1,1 +1,1 @@
-from .allen_oephys_dashboard import AllenOephysDashboard
+from .allen_oephys_dashboard import AllenDashboard

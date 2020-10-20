@@ -46,9 +46,9 @@ class AllenDashboard(html.Div):
                 dbc.Row(
                     dbc.Col(
                         id='div-controller',
-                        children= dbc.Card(
+                        children=dbc.Card(
                             self.controller_time,
-                            style={'margin-bottom': '10px', 'max-height': '75px'}
+                            style={'margin-bottom': '20px', 'max-height': '75px', 'box-shadow': "4px 4px 4px 2px lightgrey"}
                         ),
                         style={'display': 'none'},
                         width={'size': 12},
@@ -57,7 +57,7 @@ class AllenDashboard(html.Div):
                 dbc.Row([
                     dbc.Col(
                         id='div-figure-traces',
-                        children = dbc.Card(
+                        children=dbc.Card(
                             dcc.Graph(
                                 id='figure_traces',
                                 figure={},
@@ -66,9 +66,9 @@ class AllenDashboard(html.Div):
                                     'edits': {
                                         'shapePosition': True
                                     }
-                                }
+                                },
                             ),
-                            style={'padding': '30px'}
+                            style={'padding': '30px', 'box-shadow': "4px 4px 4px 2px lightgrey"}
                         ),
                         style={'display': 'none'},
                         width={'size': 8}
@@ -152,7 +152,7 @@ class AllenDashboard(html.Div):
                 }]
             )
 
-            return {'display': 'inline-block'}, self.traces
+            return {'display': "inline-block"}, self.traces
 
         @self.parent_app.callback(
             [
@@ -283,20 +283,20 @@ class AllenDashboard(html.Div):
                 "title": {"text": "Ephys [V]", "font": {"color": "#151733", "size": 16}}
             },
             row=1, col=1
-            )
+        )
         self.traces.update_yaxes(
             patch={
                 "title": {"text": "dF/F", "font": {"color": "#151733", "size": 16}}
             },
-            row=3, col=1)
-
-        self.traces.update_yaxes(patch={
-            "title": {"text": "Spikes", "font": {"color": "#151733", 'size': 16}},
-            "showticklabels": True,
-            "ticks": "outside",
-            "tickcolor": "white",
-            "color": "white",
-
+            row=3, col=1
+        )
+        self.traces.update_yaxes(
+            patch={
+                "title": {"text": "Spikes", "font": {"color": "#151733", 'size': 16}},
+                "showticklabels": True,
+                "ticks": "outside",
+                "tickcolor": "white",
+                "color": "white",
             },
             row=2, col=1
         )
