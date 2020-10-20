@@ -37,8 +37,6 @@ class AllenEcephysInterface(BaseDataInterface):
 
         # Get metadata info from files
         subjects_info_path = self.input_args['source_data']['path_subjects_info']
-        print(Path(subjects_info_path).is_file())
-
         if Path(subjects_info_path).is_file():
             with open(subjects_info_path, 'r') as inp:
                 subjects_info = json.load(inp)
