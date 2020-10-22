@@ -21,7 +21,12 @@
           "format": "file",
           "description": "path to raw data file"
         },
-        "path_tiff": {
+        "path_tiff_red_channel": {
+          "type": "string",
+          "format": "file",
+          "description": "path to tiff data file"
+        },
+        "path_tiff_green_channel": {
           "type": "string",
           "format": "file",
           "description": "path to tiff data file"
@@ -40,29 +45,35 @@
       "required": [
         "ophys_raw",
         "ophys_processed",
-        "ecephys_spiking",
-        "ecephys_processed"
+        "ecephys_raw",
+        "ecephys_processed",
+        "ecephys_spiking"
       ],
       "properties": {
         "ophys_raw": {
           "type": "boolean",
-          "default": true,
+          "default": false,
           "description": "convert raw ophys data to nwb"
         },
         "ophys_processed": {
           "type": "boolean",
-          "default": true,
+          "default": false,
           "description": "convert processed ophys data to nwb"
         },
-        "ecephys_spiking": {
-          "type": "boolean",
-          "default": true,
-          "description": "convert spiking data to nwb"
-        },
-        "ecephys_processed": {
+        "ecephys_raw": {
           "type": "boolean",
           "default": true,
           "description": "convert ecephys processed data to nwb"
+        },
+        "ecephys_processed": {
+          "type": "boolean",
+          "default": false,
+          "description": "convert ecephys processed data to nwb"
+        },
+        "ecephys_spiking": {
+          "type": "boolean",
+          "default": false,
+          "description": "convert spiking data to nwb"
         }
       }
     }

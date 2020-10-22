@@ -29,6 +29,13 @@ class AllenEcephysInterface(BaseDataInterface):
         metadata_schema['properties']['Ecephys']['properties']['Device'] = get_schema_from_hdmf_class(pynwb.device.Device)
         metadata_schema['properties']['Ecephys']['properties']['ElectrodeGroup'] = get_schema_from_hdmf_class(pynwb.ecephys.ElectrodeGroup)
         metadata_schema['properties']['Ecephys']['properties']['ElectricalSeries_raw'] = get_schema_from_hdmf_class(pynwb.ecephys.ElectricalSeries)
+
+        metadata_schema['properties']['Ophys'] = get_base_schema(tag='Ophys')
+        metadata_schema['properties']['Ophys']['properties']['Device'] = get_schema_from_hdmf_class(pynwb.device.Device)
+        metadata_schema['properties']['Ophys']['properties']['TwoPhotonSeries'] = get_schema_from_hdmf_class(pynwb.ophys.TwoPhotonSeries)
+        metadata_schema['properties']['Ophys']['properties']['Fluorescence'] = get_schema_from_hdmf_class(pynwb.ophys.Fluorescence)
+        metadata_schema['properties']['Ophys']['properties']['ImagingPlane'] = get_schema_from_hdmf_class(pynwb.ophys.ImagingPlane)
+        # metadata_schema['properties']['Ophys']['properties']['ImageSegmentation'] = get_schema_from_hdmf_class(pynwb.ophys.ImageSegmentation)
         return metadata_schema
 
     def get_metadata(self):
@@ -98,12 +105,25 @@ class AllenEcephysInterface(BaseDataInterface):
                      stub_test: bool = False):
         self.nwbfile = nwbfile
 
-        # ElectrodeGroups
-        self._create_electrode_groups(metadata_dict['Ecephys'])
-        # Electrodes
-        self._create_electrodes()
-        # Raw ecephys
-        self._create_raw_ecephys(metadata_dict['Ecephys'])
+        if self.input_args['conversion_options']['ecephys_raw'] or self.input_args['conversion_options']['ecephys_processed']:
+            # ElectrodeGroups
+            self._create_electrode_groups(metadata_dict['Ecephys'])
+            # Electrodes
+            self._create_electrodes()
+
+        if self.input_args['conversion_options']['ecephys_raw']:
+            # Raw ecephys
+            self._create_ecephys_raw(metadata_dict['Ecephys'])
+
+        if self.input_args['conversion_options']['ecephys_processed']:
+            # Processed ecephys
+            self._create_ecephys_processed(metadata_dict['Ecephys'])
+
+        if self.input_args['conversion_options']['ecephys_spiking']:
+            # Spiking data ecephys
+            self._create_ecephys_spiking(metadata_dict['Ecephys'])
+
+        return self.nwbfile
 
     def _create_electrode_groups(self, metadata_ecephys):
         """
@@ -117,6 +137,7 @@ class AllenEcephysInterface(BaseDataInterface):
             such as 'Device', 'ElectrodeGroup', etc.
         """
         for key in [k for k in metadata_ecephys if 'ElectrodeGroup' in k]:
+            print(f'Adding ElectrodesGroup: {key}...')
             metadata_elec_group = metadata_ecephys[key]
             eg_name = metadata_elec_group['name']
             # Tests if ElectrodeGroup already exists
@@ -142,6 +163,7 @@ class AllenEcephysInterface(BaseDataInterface):
 
     def _create_electrodes(self):
         """Add electrode"""
+        print('Adding electrode...')
         electrode_group = list(self.nwbfile.electrode_groups.values())[0]
         self.nwbfile.add_electrode(
             id=0,
@@ -152,9 +174,9 @@ class AllenEcephysInterface(BaseDataInterface):
             group=electrode_group
         )
 
-    def _create_raw_ecephys(self, metadata_ecephys):
+    def _create_ecephys_raw(self, metadata_ecephys):
         """Add raw membrane voltage data"""
-        self._create_electrodes_ecephys()
+        print('Converting raw ecephys data...')
         path_raw = self.input_args["source_data"]["path_raw"]
         with h5py.File(path_raw, 'r') as f:
             electrode_table_region = self.nwbfile.create_electrode_table_region(
@@ -175,3 +197,13 @@ class AllenEcephysInterface(BaseDataInterface):
                 rate=ecephys_rate,
             )
             self.nwbfile.add_acquisition(electrical_series)
+
+    def _create_ecephys_processed(self, metadata_ecephys):
+        """Add processed membrane voltage data"""
+        raise NotImplementedError('TODO')
+        print('Converting processed ecephys data...')
+
+    def _create_ecephys_spiking(self, metadata_ecephys):
+        """Add spiking data"""
+        raise NotImplementedError('TODO')
+        print('Converting spiking data...')
