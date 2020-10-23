@@ -103,21 +103,21 @@ class AllenEcephysInterface(BaseDataInterface):
                      stub_test: bool = False):
         # self.nwbfile = nwbfile
 
-        if self.input_args['conversion_options']['ecephys_raw'] or self.input_args['conversion_options']['ecephys_processed']:
+        if self.input_args['ecephys_raw'] or self.input_args['ecephys_processed']:
             # ElectrodeGroups
             self._create_electrode_groups(metadata_dict['Ecephys'])
             # Electrodes
             self._create_electrodes()
 
-        if self.input_args['conversion_options']['ecephys_raw']:
+        if self.input_args['ecephys_raw']:
             # Raw ecephys
             self._create_ecephys_raw(metadata_dict['Ecephys'])
 
-        if self.input_args['conversion_options']['ecephys_processed']:
+        if self.input_args['ecephys_processed']:
             # Processed ecephys
             self._create_ecephys_processed(metadata_dict['Ecephys'])
 
-        if self.input_args['conversion_options']['ecephys_spiking']:
+        if self.input_args['ecephys_spiking']:
             # Spiking data ecephys
             self._create_ecephys_spiking(metadata_dict['Ecephys'])
 
@@ -173,7 +173,7 @@ class AllenEcephysInterface(BaseDataInterface):
     def _create_ecephys_raw(self, metadata_ecephys):
         """Add raw membrane voltage data"""
         print('Converting raw ecephys data...')
-        path_raw = self.input_args["source_data"]["path_raw"]
+        path_raw = self.input_args["path_raw"]
         with h5py.File(path_raw, 'r') as f:
             electrode_table_region = self.nwbfile.create_electrode_table_region(
                 region=[0],
