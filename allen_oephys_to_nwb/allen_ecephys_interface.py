@@ -40,27 +40,25 @@ class AllenEcephysInterface(BaseDataInterface):
 
     def get_metadata(self):
         """Auto-fill as much of the metadata as possible."""
-        metadata = dict()
-
         # Get metadata info from files
-        subjects_info_path = self.input_args['source_data']['path_subjects_info']
+        subjects_info_path = self.input_args['path_subjects_info']
         if Path(subjects_info_path).is_file():
             with open(subjects_info_path, 'r') as inp:
                 subjects_info = json.load(inp)
 
         subject_info = {
-            'subject_id': '',
-            'line': '',
-            'age': '',
-            'anesthesia': ''
+            'subject_id': None,
+            'line': None,
+            'age': None,
+            'anesthesia': None
         }
 
         session_identifier = str(uuid.uuid4())
-        if 'path_processed' in self.input_args['source_data']:
-            with h5py.File(self.input_args['source_data']['path_processed'], 'r') as f:
+        if 'path_processed' in self.input_args:
+            with h5py.File(self.input_args['path_processed'], 'r') as f:
                 session_identifier = str(int(f['tid'][0]))
                 if np.isnan(f['aid'][0]):
-                    print(f"File {self.input_args['source_data']['path_processed']} does not have 'aid' key. Skipping it...")
+                    print(f"File {self.input_args['path_processed']} does not have 'aid' key. Skipping it...")
                 else:
                     subject_id = str(int(f['aid'][0]))
                     subject_info = subjects_info[subject_id]
@@ -91,7 +89,7 @@ class AllenEcephysInterface(BaseDataInterface):
         )
 
         # Raw electrical series metadata
-        path_raw = Path(self.input_args["source_data"]["path_raw"])
+        path_raw = Path(self.input_args["path_raw"])
         with h5py.File(path_raw, 'r') as f:
             ecephys_rate = 1 / np.array(f['dte'])
         metadata['Ecephys']['ElectricalSeries_raw'] = {
@@ -103,7 +101,7 @@ class AllenEcephysInterface(BaseDataInterface):
 
     def convert_data(self, nwbfile: NWBFile, metadata_dict: dict,
                      stub_test: bool = False):
-        self.nwbfile = nwbfile
+        # self.nwbfile = nwbfile
 
         if self.input_args['conversion_options']['ecephys_raw'] or self.input_args['conversion_options']['ecephys_processed']:
             # ElectrodeGroups
@@ -122,8 +120,6 @@ class AllenEcephysInterface(BaseDataInterface):
         if self.input_args['conversion_options']['ecephys_spiking']:
             # Spiking data ecephys
             self._create_ecephys_spiking(metadata_dict['Ecephys'])
-
-        return self.nwbfile
 
     def _create_electrode_groups(self, metadata_ecephys):
         """
