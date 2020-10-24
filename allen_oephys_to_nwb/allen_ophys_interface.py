@@ -42,14 +42,16 @@ class AllenOphysInterface(BaseDataInterface):
             Fluorescence=dict(name='Fluorescence'),
             ImagingPlane=dict(
                 name='ImagingPlane',
+                description='ADDME',
+                indicator='ADDME',
                 device='Bruker 2-p microscope',
                 excitation_lambda=920,
                 location='primary visual cortex - layer 2/3',
                 # optical_channel=[
                 #     dict(
+                #         name='optical_channel',
                 #         description='2P Optical Channel',
-                #         emission_lambda=510,
-                #         name='optical_channel'
+                #         emission_lambda=510
                 #     )
                 # ]
             ),

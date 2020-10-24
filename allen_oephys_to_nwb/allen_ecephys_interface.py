@@ -53,34 +53,46 @@ class AllenEcephysInterface(BaseDataInterface):
             ecephys_rate = 1 / np.array(f['dte'])
         metadata['Ecephys']['ElectricalSeries_raw'] = {
             'name': 'ElectricalSeries_raw',
-            'rate': ecephys_rate
+            'description': 'ADDME',
+            'rate': float(ecephys_rate)
         }
 
         return metadata
 
     def convert_data(self, nwbfile: NWBFile, metadata_dict: dict,
                      stub_test: bool = False):
-        # self.nwbfile = nwbfile
 
         if self.input_args['ecephys_raw'] or self.input_args['ecephys_processed']:
             # ElectrodeGroups
-            self._create_electrode_groups(metadata_dict['Ecephys'])
+            self._create_electrode_groups(
+                nwbfile=nwbfile,
+                metadata_ecephys=metadata_dict['Ecephys']
+            )
             # Electrodes
-            self._create_electrodes()
+            self._create_electrodes(nwbfile=nwbfile)
 
         if self.input_args['ecephys_raw']:
             # Raw ecephys
-            self._create_ecephys_raw(metadata_dict['Ecephys'])
+            self._create_ecephys_raw(
+                nwbfile=nwbfile,
+                metadata_ecephys=metadata_dict['Ecephys']
+            )
 
         if self.input_args['ecephys_processed']:
             # Processed ecephys
-            self._create_ecephys_processed(metadata_dict['Ecephys'])
+            self._create_ecephys_processed(
+                nwbfile=nwbfile,
+                metadata_ecephys=metadata_dict['Ecephys']
+            )
 
         if self.input_args['ecephys_spiking']:
             # Spiking data ecephys
-            self._create_ecephys_spiking(metadata_dict['Ecephys'])
+            self._create_ecephys_spiking(
+                nwbfile=nwbfile,
+                metadata_ecephys=metadata_dict['Ecephys']
+            )
 
-    def _create_electrode_groups(self, metadata_ecephys):
+    def _create_electrode_groups(self, nwbfile, metadata_ecephys):
         """
         Use metadata to create ElectrodeGroup object(s) in the NWBFile
 
@@ -96,31 +108,31 @@ class AllenEcephysInterface(BaseDataInterface):
             metadata_elec_group = metadata_ecephys[key]
             eg_name = metadata_elec_group['name']
             # Tests if ElectrodeGroup already exists
-            aux = [i.name == eg_name for i in self.nwbfile.children]
+            aux = [i.name == eg_name for i in nwbfile.children]
             if any(aux):
                 print(eg_name + ' already exists in current NWBFile.')
             else:
                 device_name = metadata_elec_group['device']
-                if device_name in self.nwbfile.devices:
-                    device = self.nwbfile.devices[device_name]
+                if device_name in nwbfile.devices:
+                    device = nwbfile.devices[device_name]
                 else:
                     print('Device ', device_name, ' for ElectrodeGroup ', eg_name, ' does not exist.')
                     print('Make sure ', device_name, ' is defined in metadata.')
 
                 eg_description = metadata_elec_group['description']
                 eg_location = metadata_elec_group['location']
-                self.nwbfile.create_electrode_group(
+                nwbfile.create_electrode_group(
                     name=eg_name,
                     location=eg_location,
                     device=device,
                     description=eg_description
                 )
 
-    def _create_electrodes(self):
+    def _create_electrodes(self, nwbfile):
         """Add electrode"""
         print('Adding electrode...')
-        electrode_group = list(self.nwbfile.electrode_groups.values())[0]
-        self.nwbfile.add_electrode(
+        electrode_group = list(nwbfile.electrode_groups.values())[0]
+        nwbfile.add_electrode(
             id=0,
             x=np.nan, y=np.nan, z=np.nan,
             imp=np.nan,
@@ -129,18 +141,18 @@ class AllenEcephysInterface(BaseDataInterface):
             group=electrode_group
         )
 
-    def _create_ecephys_raw(self, metadata_ecephys):
+    def _create_ecephys_raw(self, nwbfile, metadata_ecephys):
         """Add raw membrane voltage data"""
         print('Converting raw ecephys data...')
         path_raw = self.input_args["path_raw"]
         with h5py.File(path_raw, 'r') as f:
-            electrode_table_region = self.nwbfile.create_electrode_table_region(
+            electrode_table_region = nwbfile.create_electrode_table_region(
                 region=[0],
                 description='electrode'
             )
 
             trace_data = np.squeeze(f['Voltage'])
-            trace_name = metadata_ecephys['ElectricalSeries_raw']['trace_name']
+            trace_name = metadata_ecephys['ElectricalSeries_raw']['name']
             description = metadata_ecephys['ElectricalSeries_raw']['description']
             ecephys_rate = metadata_ecephys['ElectricalSeries_raw']['rate']
             electrical_series = pynwb.ecephys.ElectricalSeries(
@@ -149,16 +161,16 @@ class AllenEcephysInterface(BaseDataInterface):
                 data=trace_data,
                 electrodes=electrode_table_region,
                 starting_time=0.,
-                rate=ecephys_rate,
+                rate=float(ecephys_rate),
             )
-            self.nwbfile.add_acquisition(electrical_series)
+            nwbfile.add_acquisition(electrical_series)
 
-    def _create_ecephys_processed(self, metadata_ecephys):
+    def _create_ecephys_processed(self, nwbfile, metadata_ecephys):
         """Add processed membrane voltage data"""
         raise NotImplementedError('TODO')
         print('Converting processed ecephys data...')
 
-    def _create_ecephys_spiking(self, metadata_ecephys):
+    def _create_ecephys_spiking(self, nwbfile, metadata_ecephys):
         """Add spiking data"""
         raise NotImplementedError('TODO')
         print('Converting spiking data...')
