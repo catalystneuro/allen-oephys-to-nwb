@@ -12,24 +12,13 @@
       "title": "Source Files",
       "type": "object",
       "required": [
-        "path_raw",
-        "subjects_info"
+        "path_raw"
       ],
       "properties": {
         "path_raw": {
           "type": "string",
           "format": "file",
           "description": "path to raw data file"
-        },
-        "path_tiff_red_channel": {
-          "type": "string",
-          "format": "file",
-          "description": "path to tiff data file"
-        },
-        "path_tiff_green_channel": {
-          "type": "string",
-          "format": "file",
-          "description": "path to tiff data file"
         },
         "path_subjects_info": {
           "type": "string",
@@ -43,23 +32,11 @@
       "title": "Conversion Options",
       "type": "object",
       "required": [
-        "ophys_raw",
-        "ophys_processed",
         "ecephys_raw",
         "ecephys_processed",
         "ecephys_spiking"
       ],
       "properties": {
-        "ophys_raw": {
-          "type": "boolean",
-          "default": false,
-          "description": "convert raw ophys data to nwb"
-        },
-        "ophys_processed": {
-          "type": "boolean",
-          "default": false,
-          "description": "convert processed ophys data to nwb"
-        },
         "ecephys_raw": {
           "type": "boolean",
           "default": true,

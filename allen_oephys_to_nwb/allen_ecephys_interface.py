@@ -1,22 +1,21 @@
 from nwb_conversion_tools.basedatainterface import BaseDataInterface
 from nwb_conversion_tools.utils import get_base_schema, get_schema_from_hdmf_class
-from . import schema
 import pynwb
 from pynwb import NWBFile
-from datetime import datetime
 from pathlib import Path
 import importlib.resources as pkg_resources
 import numpy as np
 import h5py
 import json
-import uuid
+from . import schema
+from .utils import get_basic_metadata
 
 
 class AllenEcephysInterface(BaseDataInterface):
 
     @classmethod
     def get_input_schema(cls):
-        with pkg_resources.open_text(schema, 'source_schema.json') as f:
+        with pkg_resources.open_text(schema, 'source_schema_ecephys.json') as f:
             input_schema = json.load(f)
         return input_schema['properties']
 
@@ -30,61 +29,21 @@ class AllenEcephysInterface(BaseDataInterface):
         metadata_schema['properties']['Ecephys']['properties']['ElectrodeGroup'] = get_schema_from_hdmf_class(pynwb.ecephys.ElectrodeGroup)
         metadata_schema['properties']['Ecephys']['properties']['ElectricalSeries_raw'] = get_schema_from_hdmf_class(pynwb.ecephys.ElectricalSeries)
 
-        metadata_schema['properties']['Ophys'] = get_base_schema(tag='Ophys')
-        metadata_schema['properties']['Ophys']['properties']['Device'] = get_schema_from_hdmf_class(pynwb.device.Device)
-        metadata_schema['properties']['Ophys']['properties']['TwoPhotonSeries'] = get_schema_from_hdmf_class(pynwb.ophys.TwoPhotonSeries)
-        metadata_schema['properties']['Ophys']['properties']['Fluorescence'] = get_schema_from_hdmf_class(pynwb.ophys.Fluorescence)
-        metadata_schema['properties']['Ophys']['properties']['ImagingPlane'] = get_schema_from_hdmf_class(pynwb.ophys.ImagingPlane)
-        # metadata_schema['properties']['Ophys']['properties']['ImageSegmentation'] = get_schema_from_hdmf_class(pynwb.ophys.ImageSegmentation)
         return metadata_schema
 
-    def get_metadata(self):
+    def get_metadata(self, metadata):
         """Auto-fill as much of the metadata as possible."""
-        # Get metadata info from files
-        subjects_info_path = self.input_args['path_subjects_info']
-        if Path(subjects_info_path).is_file():
-            with open(subjects_info_path, 'r') as inp:
-                subjects_info = json.load(inp)
 
-        subject_info = {
-            'subject_id': None,
-            'line': None,
-            'age': None,
-            'anesthesia': None
-        }
+        if not metadata:
+            metadata = get_basic_metadata(input_args=self.input_args)
 
-        session_identifier = str(uuid.uuid4())
-        if 'path_processed' in self.input_args:
-            with h5py.File(self.input_args['path_processed'], 'r') as f:
-                session_identifier = str(int(f['tid'][0]))
-                if np.isnan(f['aid'][0]):
-                    print(f"File {self.input_args['path_processed']} does not have 'aid' key. Skipping it...")
-                else:
-                    subject_id = str(int(f['aid'][0]))
-                    subject_info = subjects_info[subject_id]
-                    subject_info['subject_id'] = subject_id
-
-        # initiate metadata
-        metadata = dict(
-            NWBFile=dict(
-                session_description='session description',
-                identifier=session_identifier,
-                session_start_time=datetime.strptime('1900-01-01 00:00:00', '%Y-%m-%d %H:%M:%S'),
-                pharmacology=subject_info['anesthesia'],
-            ),
-            Subject=dict(
-                subject_id=subject_info['subject_id'],
-                genotype=subject_info['line'],
-                age=subject_info['age']
-            ),
-            Ecephys=dict(
-                Device=dict(name='Device_ecephys'),
-                ElectrodeGroup=dict(
-                    name='ElectrodeGroup',
-                    description='no description',
-                    location='unknown',
-                    device='Device_ecephys'
-                )
+        metadata['Ecephys'] = dict(
+            Device=dict(name='MultiClamp 700B'),
+            ElectrodeGroup=dict(
+                name='ElectrodeGroup',
+                description='2-p targeted cell-attached',
+                location='primary visual cortex - layer 2/3',
+                device='MultiClamp 700B'
             )
         )
 

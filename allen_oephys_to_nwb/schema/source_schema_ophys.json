@@ -11,16 +11,8 @@
     "source_data": {
       "title": "Source Files",
       "type": "object",
-      "required": [
-        "path_raw",
-        "subjects_info"
-      ],
+      "required": [],
       "properties": {
-        "path_raw": {
-          "type": "string",
-          "format": "file",
-          "description": "path to raw data file"
-        },
         "path_tiff_red_channel": {
           "type": "string",
           "format": "file",
@@ -30,11 +22,6 @@
           "type": "string",
           "format": "file",
           "description": "path to tiff data file"
-        },
-        "path_calibration": {
-          "type": "string",
-          "format": "file",
-          "description": "path to calibration data file"
         },
         "path_processed": {
           "type": "string",
@@ -54,10 +41,7 @@
       "type": "object",
       "required": [
         "ophys_raw",
-        "ophys_processed",
-        "ecephys_raw",
-        "ecephys_processed",
-        "ecephys_spiking"
+        "ophys_processed"
       ],
       "properties": {
         "ophys_raw": {
@@ -69,21 +53,6 @@
           "type": "boolean",
           "default": true,
           "description": "convert processed ophys data to nwb"
-        },
-        "ecephys_raw": {
-          "type": "boolean",
-          "default": true,
-          "description": "convert ecephys processed data to nwb"
-        },
-        "ecephys_processed": {
-          "type": "boolean",
-          "default": true,
-          "description": "convert ecephys processed data to nwb"
-        },
-        "ecephys_spiking": {
-          "type": "boolean",
-          "default": true,
-          "description": "convert spiking data to nwb"
         }
       }
     }

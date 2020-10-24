@@ -18,8 +18,8 @@ class AllenOephysNWBConverter(NWBConverter):
 
     # Modular data interfaces
     data_interface_classes = {
-        # 'AllenOphys': AllenOphysInterface,
-        'AllenEcephys': AllenEcephysInterface,
+        'AllenEcephysInterface': AllenEcephysInterface,
+        'AllenOphysInterface': AllenOphysInterface,
     }
 
     def __init__(self, input_data):
