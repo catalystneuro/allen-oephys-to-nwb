@@ -19,7 +19,7 @@ class AllenOphysInterface(BaseDataInterface):
     def get_input_schema(cls):
         with pkg_resources.open_text(schema, 'input_schema_ophys.json') as f:
             input_schema = json.load(f)
-        return input_schema['properties']
+        return input_schema
 
     def __init__(self, **input_args):
         super().__init__(**input_args)
