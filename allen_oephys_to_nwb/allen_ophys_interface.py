@@ -35,12 +35,10 @@ class AllenOphysInterface(BaseDataInterface):
 
         return metadata_schema
 
-    def get_metadata(self, metadata):
+    def get_metadata(self):
         """Auto-fill as much of the metadata as possible."""
 
-        if not metadata:
-            metadata = get_basic_metadata(input_args=self.input_args)
-
+        metadata = get_basic_metadata(input_args=self.input_args)
         metadata['Ophys'] = dict(
             Device=dict(name='Bruker 2-p microscope'),
             Fluorescence=dict(name='Fluorescence'),
