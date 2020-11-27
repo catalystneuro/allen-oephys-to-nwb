@@ -1,5 +1,5 @@
 from nwb_conversion_tools.basedatainterface import BaseDataInterface
-from nwb_conversion_tools.utils import get_metadata_schema, get_base_schema, get_schema_from_hdmf_class
+#from nwb_conversion_tools.utils import get_metadata_schema, get_base_schema, get_schema_from_hdmf_class
 import pynwb
 from pynwb import NWBFile
 from pathlib import Path
@@ -14,7 +14,7 @@ from .utils import get_basic_metadata
 class AllenEcephysInterface(BaseDataInterface):
 
     @classmethod
-    def get_input_schema(cls):
+    def get_source_schema(cls):
         with pkg_resources.open_text(schema, 'input_schema_ecephys.json') as f:
             input_schema = json.load(f)
         return input_schema

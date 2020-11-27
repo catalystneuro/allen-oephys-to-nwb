@@ -36,7 +36,7 @@ pp.pprint(metadata_dict)
 aux = False
 if aux:
     print('Input schema:')
-    pp.pprint(AllenOephysNWBConverter.get_input_schema())
+    pp.pprint(AllenOephysNWBConverter.get_source_schema())
     print('')
 
     print('Interface input args:')

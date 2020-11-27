@@ -1,5 +1,5 @@
 from nwb_conversion_tools.basedatainterface import BaseDataInterface
-from nwb_conversion_tools.utils import get_schema_from_hdmf_class, get_base_schema, get_metadata_schema
+#from nwb_conversion_tools.utils import get_schema_from_hdmf_class, get_base_schema, get_metadata_schema
 from pynwb import NWBFile
 import pynwb
 
@@ -16,7 +16,7 @@ from .utils import get_basic_metadata
 class AllenOphysInterface(BaseDataInterface):
 
     @classmethod
-    def get_input_schema(cls):
+    def get_source_schema(cls):
         with pkg_resources.open_text(schema, 'input_schema_ophys.json') as f:
             input_schema = json.load(f)
         return input_schema
