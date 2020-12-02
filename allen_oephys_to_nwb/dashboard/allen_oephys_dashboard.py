@@ -12,7 +12,7 @@ from dash.dependencies import Input, Output, State, ALL
 import dash
 from pathlib import Path
 import pynwb
-from nwb_web_gui.dashapps.utils.make_components import FileBrowserComponent
+from json_schema_to_dash_forms.utils import FileBrowserComponent
 from .components.time_controller import TimeControllerComponent
 from .components.tiff_component import TiffImageSeriesComponent
 
