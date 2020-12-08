@@ -40,24 +40,22 @@ class AllenEcephysInterface(BaseDataInterface):
                 description='2-p targeted cell-attached',
                 location='primary visual cortex - layer 2/3',
                 device='MultiClamp 700B'
+            ),
+            ElectricalSeries_raw=dict(
+                name='ElectricalSeries_raw',
+                description='ADDME',
+            ),
+            ElectricalSeries_processed=dict(
+                name='ElectricalSeries_processed',
+                description='voltage trace filtered between 250 Hz and 5 kHz',
             )
         )
 
         # Raw electrical series metadata
         path_raw = Path(self.source_data["path_ecephys_raw"])
-        with h5py.File(path_raw, 'r') as f:
-            ecephys_rate = 1 / np.array(f['dte'][0])
-        metadata['Ecephys']['ElectricalSeries_raw'] = {
-            'name': 'ElectricalSeries_raw',
-            'description': 'ADDME',
-            'rate': float(ecephys_rate)
-        }
-
-        # Processed electrical series metadata
-        metadata['Ecephys']['ElectricalSeries_processed'] = {
-            'name': 'ElectricalSeries_processed',
-            'description': 'voltage trace filtered between 250 Hz and 5 kHz'
-        }
+        if path_raw.is_file():
+            with h5py.File(path_raw, 'r') as f:
+                metadata['Ecephys']['ElectricalSeries_raw']['rate'] = 1 / np.array(f['dte'][0])
 
         return metadata
 

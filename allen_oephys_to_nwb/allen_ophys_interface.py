@@ -29,9 +29,9 @@ class AllenOphysInterface(BaseDataInterface):
         metadata_schema['properties']['Ophys'] = get_base_schema(tag='Ophys')
         metadata_schema['properties']['Ophys']['properties']['Device'] = get_schema_from_hdmf_class(pynwb.device.Device)
         metadata_schema['properties']['Ophys']['properties']['ImagingPlane'] = get_schema_from_hdmf_class(pynwb.ophys.ImagingPlane)
-        metadata_schema['properties']['Ophys']['properties']['TwoPhotonSeries_processed'] = get_schema_from_hdmf_class(pynwb.ophys.TwoPhotonSeries)
+        metadata_schema['properties']['Ophys']['properties']['TwoPhotonSeries_green'] = get_schema_from_hdmf_class(pynwb.ophys.TwoPhotonSeries)
         metadata_schema['properties']['Ophys']['properties']['Fluorescence'] = get_schema_from_hdmf_class(pynwb.ophys.Fluorescence)
-        # metadata_schema['properties']['Ophys']['properties']['ImageSegmentation'] = get_schema_from_hdmf_class(pynwb.ophys.ImageSegmentation)
+        metadata_schema['properties']['Ophys']['properties']['ImageSegmentation'] = get_schema_from_hdmf_class(pynwb.ophys.ImageSegmentation)
 
         return metadata_schema
 

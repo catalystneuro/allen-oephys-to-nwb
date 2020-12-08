@@ -5,6 +5,8 @@ import json
 import uuid
 import h5py
 import pytz
+import random
+import string
 
 
 def get_basic_metadata(source_data):
@@ -17,7 +19,7 @@ def get_basic_metadata(source_data):
                 all_subjects_info = json.load(inp)
 
     subject_info = {
-        'subject_id': None,
+        'subject_id': ''.join(random.choices(string.ascii_uppercase + string.digits, k=5)),
         'line': None,
         'age': None,
         'anesthesia': None
@@ -35,7 +37,7 @@ def get_basic_metadata(source_data):
                 subject_info['subject_id'] = subject_id
 
     # initiate metadata
-    session_start_time=datetime.strptime('1900-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
+    session_start_time = datetime.strptime('1900-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
     session_start_time_tzaware = pytz.timezone('EST').localize(session_start_time)
     metadata = dict(
         NWBFile=dict(
