@@ -1,16 +1,13 @@
 from datetime import datetime
-from dateutil.tz import tzlocal
-from pynwb import NWBFile, NWBHDF5IO
-from pynwb.file import Subject
 from pynwb.ophys import TwoPhotonSeries, OpticalChannel, Fluorescence, ImageSegmentation
 from pynwb.ecephys import ElectricalSeries
-from pynwb.device import Device
 from hdmf.data_utils import DataChunkIterator
 from nwb_conversion_tools import NWBConverter
 
 from .subjects_info import subjects_info
+from .allen_ophys_interface import AllenOphysInterface
+from .allen_ecephys_interface import AllenEcephysInterface
 
-from pathlib import Path
 from libtiff import TIFF
 from PIL import Image as pImage
 import numpy as np
@@ -19,7 +16,16 @@ import h5py
 
 class AllenOephysNWBConverter(NWBConverter):
 
-    def __init__(self, source_paths, metadata=None, nwbfile=None):
+    # Modular data interfaces
+    data_interface_classes = {
+        'AllenEcephysInterface': AllenEcephysInterface,
+        'AllenOphysInterface': AllenOphysInterface,
+    }
+
+    def run_conversion_old(self, source_paths, metadata=None, nwbfile=None):
+
+        raise NotImplementedError('This is the old code, needs to be refactored into the new converter')
+
         # Set up metadata with info from files
         with h5py.File(source_paths['path_processed'], 'r') as f:
             if np.isnan(f['aid'][0]):

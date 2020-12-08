@@ -1,0 +1,40 @@
+NWBFile:
+  experimenter:
+    - Lawrence Huang
+  identifier: f30a9afd-707a-49a8-acce-69fd0ffb1a3e
+  institution: Allen Institute for Brain Science
+  session_description: my description
+  session_start_time: '1900-01-01T10:00:00.000+05:00'
+Ecephys:
+  Device:
+    name: MultiClamp 700B
+  ElectricalSeries_raw:
+    description: ADDME
+    name: ElectricalSeries_raw
+    rate: 40000
+  ElectrodeGroup:
+    description: 2-p targeted cell-attached
+    device: MultiClamp 700B
+    location: primary visual cortex - layer 2/3
+    name: ElectrodeGroup
+Ophys:
+  Device:
+    name: Bruker 2-p microscope
+  Fluorescence:
+    name: Fluorescence
+    roi_response_series: []
+  ImagingPlane:
+    description: ADDME
+    device: MultiClamp 700B
+    excitation_lambda: 920
+    imaging_rate: 0
+    indicator: ADDME
+    location: primary visual cortex - layer 2/3
+    name: ImagingPlane
+    optical_channel:
+    - description: desc
+      emission_lambda: 4
+      name: opt
+  TwoPhotonSeries:
+    imaging_plane: ImagingPlane
+    name: TwoPhotonSeries_green

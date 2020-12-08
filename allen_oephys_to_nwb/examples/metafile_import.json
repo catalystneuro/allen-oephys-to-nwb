@@ -1,0 +1,56 @@
+{
+    "NWBFile": {
+        "session_description": "my description",
+        "identifier": "f30a9afd-707a-49a8-acce-69fd0ffb1a3e",
+        "session_start_time": "1900-01-01T10:00:00.000+05:00",
+        "experimenter": [
+            "Lawrence Huang"
+        ],
+        "institution": "Allen Institute for Brain Science"
+    },
+    "Ecephys": {
+        "Device": {
+            "name": "MultiClamp 700B"
+        },
+        "ElectrodeGroup": {
+            "name": "ElectrodeGroup",
+            "description": "2-p targeted cell-attached",
+            "location": "primary visual cortex - layer 2/3",
+            "device": "MultiClamp 700B"
+        },
+        "ElectricalSeries_raw": {
+            "name": "ElectricalSeries_raw",
+            "rate": "40000",
+            "description": "ADDME"
+        }
+    },
+    "Ophys": {
+        "Device": {
+            "name": "Bruker 2-p microscope"
+        },
+        "ImagingPlane": {
+            "name": "ImagingPlane",
+            "optical_channel": [
+                {
+                    "name": "opt",
+                    "description": "desc",
+                    "emission_lambda": "4"
+                }
+            ],
+            "description": "ADDME",
+            "device": "MultiClamp 700B",
+            "excitation_lambda": "920",
+            "indicator": "ADDME",
+            "location": "primary visual cortex - layer 2/3",
+            "imaging_rate": "0"
+        },
+        "TwoPhotonSeries": {
+            "name": "TwoPhotonSeries_green",
+            "imaging_plane": "ImagingPlane"
+        },
+        "Fluorescence": {
+            "roi_response_series": [],
+            "name": "Fluorescence"
+        }
+    }
+}

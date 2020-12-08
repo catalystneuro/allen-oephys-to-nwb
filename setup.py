@@ -19,6 +19,9 @@ setup(
     email='ben.dichter@gmail.com',
     packages=find_packages(),
     include_package_data=True,
-    package_data={'': ['*.yml']},
+    package_data={'': ['*.yml', '*.json']},
     install_requires=install_requires,
+    entry_points={
+        'console_scripts': ['nwbgui-oephys=allen_oephys_to_nwb.cmd_line:cmd_line_shortcut'],
+    }
 )

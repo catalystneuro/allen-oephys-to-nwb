@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "input.schema.json",
+  "title": "Source ophys data",
+  "description": "Schema for the ophys source data",
+  "version": "0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [],
+  "properties": {
+    "path_tiff_red_channel": {
+      "type": "string",
+      "format": "file",
+      "description": "path to tiff data file"
+    },
+    "path_tiff_green_channel": {
+      "type": "string",
+      "format": "file",
+      "description": "path to tiff data file"
+    },
+    "path_ophys_processed": {
+      "type": "string",
+      "format": "file",
+      "description": "path to processed data file"
+    },
+    "path_subjects_info": {
+      "type": "string",
+      "format": "file",
+      "description": "path to subjects info data file"
+    }
+  }
+}

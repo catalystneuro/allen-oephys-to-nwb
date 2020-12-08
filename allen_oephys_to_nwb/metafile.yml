@@ -10,15 +10,21 @@ Subject:
   age: ADDME
 Ecephys:
   Device:
-    - name: MultiClamp 700B
+    name: MultiClamp 700B
   ElectrodeGroup:
-    - description: 2-p targeted cell-attached
-      device: MultiClamp 700B
-      location: primary visual cortex - layer 2/3
-      name: electrode_group
+    description: 2-p targeted cell-attached
+    device: MultiClamp 700B
+    location: primary visual cortex - layer 2/3
+    name: electrode_group
+  ElectricalSeries_raw:
+    name: ElectricalSeries_raw
+    description: raw voltage trace
+  ElectricalSeries_processed:
+    name: ElectricalSeries_processed
+    description: voltage trace filtered between 250 Hz and 5 kHz
 Ophys:
   Device:
-    - name: Bruker 2-p microscope
+    name: Bruker 2-p microscope
   Fluorescence:
     name: fluorescence
     roi_response_series:
@@ -29,19 +35,19 @@ Ophys:
       - name: plane_segmentation
         description: ADDME
         imaging_plane: imaging_plane
-        reference_images: raw_ophys
+        reference_images: TwoPhotonSeries_green
   ImagingPlane:
-    - description: ADDME
-      device: Bruker 2-p microscope
-      excitation_lambda: 920.0
-      imaging_rate: ADDME
-      indicator: ADDME
-      location: primary visual cortex - layer 2/3
-      name: imaging_plane
-      optical_channel:
-        - description: 2P Optical Channel
-          emission_lambda: 510.0
-          name: optical_channel
-  TwoPhotonSeries:
-    - name: raw_ophys
-      imaging_plane: imaging_plane
+    description: ADDME
+    device: Bruker 2-p microscope
+    excitation_lambda: 920.0
+    imaging_rate: ADDME
+    indicator: ADDME
+    location: primary visual cortex - layer 2/3
+    name: imaging_plane
+    optical_channel:
+      - description: 2P Optical Channel
+        emission_lambda: 510.0
+        name: optical_channel
+  TwoPhotonSeries_green:
+    name: TwoPhotonSeries_green
+    imaging_plane: imaging_plane
