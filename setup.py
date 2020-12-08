@@ -10,7 +10,7 @@ with open('requirements.txt') as f:
     install_requires = f.read().strip().split('\n')
 
 setup(
-    name='allen_to_nwb',
+    name='allen_oephys_to_nwb',
     version='0.1.0',
     description='NWB conversion scripts and tutorials.',
     long_description=long_description,
