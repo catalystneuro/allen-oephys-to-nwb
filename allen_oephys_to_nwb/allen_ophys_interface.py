@@ -72,7 +72,8 @@ class AllenOphysInterface(BaseDataInterface):
         add_ophys_raw : boolean
         add_ophys_processed : boolean
         """
-        print(nwbfile)
+        return
+        # print(nwbfile)
         # raise NotImplementedError('TODO')
 
     def _get_imaging_plane(self, nwbfile: NWBFile, metadata_imgplane: dict):

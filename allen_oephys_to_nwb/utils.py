@@ -4,6 +4,7 @@ import numpy as np
 import json
 import uuid
 import h5py
+import pytz
 
 
 def get_basic_metadata(source_data):
@@ -34,11 +35,13 @@ def get_basic_metadata(source_data):
                 subject_info['subject_id'] = subject_id
 
     # initiate metadata
+    session_start_time=datetime.strptime('1900-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
+    session_start_time_tzaware = pytz.timezone('EST').localize(session_start_time)
     metadata = dict(
         NWBFile=dict(
             session_description='session description',
             identifier=session_identifier,
-            session_start_time=datetime.strptime('1900-01-01 00:00:00', '%Y-%m-%d %H:%M:%S'),
+            session_start_time=session_start_time_tzaware.isoformat(),
             institution='Allen Institute for Brain Science',
             pharmacology=subject_info['anesthesia'],
         ),
