@@ -82,12 +82,13 @@ class AllenOphysInterface(BaseDataInterface):
         return metadata
 
     def run_conversion(self, nwbfile: NWBFile, metadata: dict,
-                       stub_test: bool = False, add_ophys_raw: bool = False,
-                       add_ophys_processed: bool = False):
+                       stub_test: bool = False, add_ophys_processed: bool = False,
+                       add_ophys_raw: bool = False, link_ophys_raw: bool = False):
         """
         Options:
         add_ophys_raw : boolean
         add_ophys_processed : boolean
+        link_ophys_raw : boolean
         """
         if add_ophys_raw or add_ophys_processed:
             # Device
@@ -104,7 +105,8 @@ class AllenOphysInterface(BaseDataInterface):
         if add_ophys_raw:
             self._create_ophys_raw(
                 nwbfile=nwbfile,
-                metadata=metadata
+                metadata=metadata,
+                link_ophys_raw=link_ophys_raw
             )
 
     def _get_imaging_plane(self, nwbfile: NWBFile, metadata_imgplane: dict):
@@ -146,6 +148,7 @@ class AllenOphysInterface(BaseDataInterface):
 
     def _create_ophys_processed(self, nwbfile: NWBFile, metadata: dict):
         """Add Fluorescence data"""
+        print('Converting processed ophys data...')
         imaging_plane = self._get_imaging_plane(
             nwbfile=nwbfile,
             metadata_imgplane=metadata['Ophys']['ImagingPlane']
@@ -208,8 +211,10 @@ class AllenOphysInterface(BaseDataInterface):
                     unit='no unit'
                 )
 
-    def _create_ophys_raw(self, nwbfile: NWBFile, metadata: dict):
+    def _create_ophys_raw(self, nwbfile: NWBFile, metadata: dict,
+                          link_ophys_raw: bool):
         """Add raw ophys data from tiff files"""
+        print('Converting raw ophys data...')
 
         # Iteratively read tiff ophys data
         def tiff_iterator(paths_tiff):
@@ -220,7 +225,7 @@ class AllenOphysInterface(BaseDataInterface):
                 tif.close()
 
         # Get imaging rate
-        with h5py.File(self.source_paths['path_ophys_processed'], 'r') as f:
+        with h5py.File(self.source_data['path_ophys_processed'], 'r') as f:
             imaging_rate = 1 / f['dto'][0]
 
         # Imaging Plane
@@ -232,13 +237,13 @@ class AllenOphysInterface(BaseDataInterface):
         metadata_twops = metadata['Ophys']['TwoPhotonSeries_green']
 
         # Link to raw data files
-        if self.input_args['raw_ophys_link']:
+        if link_ophys_raw:
             starting_frames = [0]
-            for i, tf in enumerate(self.source_paths['paths_tiff'][0:-1]):
+            for i, tf in enumerate(self.source_data['path_tiff_green_channel'][0:-1]):
                 n_frames = pImage.open(tf).n_frames
                 starting_frames.append(n_frames + starting_frames[i])
             two_photon_series = pynwb.ophys.TwoPhotonSeries(
-                name='raw_ophys',
+                name=metadata_twops['name'],
                 imaging_plane=imaging_plane,
                 format='tiff',
                 external_file=self.source_data['paths_tiff'],
@@ -249,9 +254,11 @@ class AllenOphysInterface(BaseDataInterface):
             )
         # Store raw data
         else:
-            raw_data_iterator = DataChunkIterator(data=tiff_iterator(self.source_paths['paths_tiff']))
+            raw_data_iterator = DataChunkIterator(
+                data=tiff_iterator([self.source_data['path_tiff_green_channel']])
+            )
             two_photon_series = pynwb.ophys.TwoPhotonSeries(
-                name='raw_ophys',
+                name=metadata_twops['name'],
                 imaging_plane=imaging_plane,
                 data=raw_data_iterator,
                 starting_time=0.,
