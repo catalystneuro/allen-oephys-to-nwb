@@ -1,0 +1,155 @@
+{
+    "222549": {
+        "line": "Emx1-s",
+        "age": "P101D",
+        "anesthesia": "Isoflurane",
+        "indicator": "GCaMP6s"
+    },
+
+    "223421": {
+        "line": "Emx1-s",
+        "age": "P109D",
+        "anesthesia": "Isoflurane",
+        "indicator": "GCaMP6s"
+    },
+
+    "223417": {
+        "line": "Emx1-s",
+        "age": "P116D",
+        "anesthesia": "Isoflurane",
+        "indicator": "GCaMP6s"
+    },
+
+    "220066": {
+        "line": "Emx1-s",
+        "age": "P147D",
+        "anesthesia": "Isoflurane",
+        "indicator": "GCaMP6s"
+    },
+
+    "294856": {
+        "line": "Emx1-s",
+        "age": "P80D",
+        "anesthesia": "Isoflurane",
+        "indicator": "GCaMP6s"
+    },
+
+    "300049": {
+        "line": "Emx1-s",
+        "age": "P63D",
+        "anesthesia": "Urethane",
+        "indicator": "GCaMP6s"
+    },
+
+    "300050": {
+        "line": "Emx1-s",
+        "age": "P65D",
+        "anesthesia": "Urethane",
+        "indicator": "GCaMP6s"
+    },
+
+    "190992": {
+        "line": "tetO-s",
+        "age": "P113D",
+        "anesthesia": "Isoflurane",
+        "indicator": "GCaMP6s"
+    },
+
+    "228048": {
+        "line": "tetO-s",
+        "age": "P89D",
+        "anesthesia": "Isoflurane",
+        "indicator": "GCaMP6s"
+    },
+
+    "228999": {
+        "line": "Emx1-f",
+        "age": "P94D",
+        "anesthesia": "Isoflurane",
+        "indicator": "GCaMP6f"
+    },
+
+    "229003": {
+        "line": "Emx1-f",
+        "age": "P96D",
+        "anesthesia": "Isoflurane",
+        "indicator": "GCaMP6f"
+    },
+
+    "248720": {
+        "line": "Emx1-f",
+        "age": "P110D",
+        "anesthesia": "Isoflurane",
+        "indicator": "GCaMP6f"
+    },
+
+    "248721": {
+        "line": "Emx1-f",
+        "age": "P117D",
+        "anesthesia": "Isoflurane",
+        "indicator": "GCaMP6f"
+    },
+
+    "252699": {
+        "line": "Emx1-f",
+        "age": "P102D",
+        "anesthesia": "Isoflurane",
+        "indicator": "GCaMP6f"
+    },
+
+    "254379": {
+        "line": "Emx1-f",
+        "age": "P95D",
+        "anesthesia": "Isoflurane",
+        "indicator": "GCaMP6f"
+    },
+
+    "268768": {
+        "line": "Cux2-f",
+        "age": "P180D",
+        "anesthesia": "Isoflurane",
+        "indicator": "GCaMP6f"
+    },
+
+    "291932": {
+        "line": "Cux2-f",
+        "age": "P82D",
+        "anesthesia": "Isoflurane",
+        "indicator": "GCaMP6f"
+    },
+
+    "291933": {
+        "line": "Cux2-f",
+        "age": "P83D",
+        "anesthesia": "Isoflurane",
+        "indicator": "GCaMP6f"
+    },
+
+    "299480": {
+        "line": "Cux2-f",
+        "age": "P72D",
+        "anesthesia": "Urethane",
+        "indicator": "GCaMP6f"
+    },
+
+    "299485": {
+        "line": "Cux2-f",
+        "age": "P87D",
+        "anesthesia": "Urethane",
+        "indicator": "GCaMP6f"
+    },
+
+    "299484": {
+        "line": "Cux2-f",
+        "age": "P92D",
+        "anesthesia": "Isoflurane",
+        "indicator": "GCaMP6f"
+    },
+
+    "303538": {
+        "line": "Cux2-f",
+        "age": "P79D",
+        "anesthesia": "Isoflurane",
+        "indicator": "GCaMP6f"
+    }
+}
