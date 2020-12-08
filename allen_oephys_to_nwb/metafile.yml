@@ -16,6 +16,12 @@ Ecephys:
     device: MultiClamp 700B
     location: primary visual cortex - layer 2/3
     name: electrode_group
+  ElectricalSeries_raw:
+    name: ElectricalSeries_raw
+    description: raw voltage trace
+  ElectricalSeries_processed:
+    name: ElectricalSeries_processed
+    description: voltage trace filtered between 250 Hz and 5 kHz
 Ophys:
   Device:
     name: Bruker 2-p microscope

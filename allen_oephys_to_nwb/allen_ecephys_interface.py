@@ -26,7 +26,7 @@ class AllenEcephysInterface(BaseDataInterface):
         metadata_schema['properties']['Ecephys']['properties']['Device'] = get_schema_from_hdmf_class(pynwb.device.Device)
         metadata_schema['properties']['Ecephys']['properties']['ElectrodeGroup'] = get_schema_from_hdmf_class(pynwb.ecephys.ElectrodeGroup)
         metadata_schema['properties']['Ecephys']['properties']['ElectricalSeries_raw'] = get_schema_from_hdmf_class(pynwb.ecephys.ElectricalSeries)
-
+        metadata_schema['properties']['Ecephys']['properties']['ElectricalSeries_processed'] = get_schema_from_hdmf_class(pynwb.ecephys.ElectricalSeries)
         return metadata_schema
 
     def get_metadata(self):
@@ -44,13 +44,19 @@ class AllenEcephysInterface(BaseDataInterface):
         )
 
         # Raw electrical series metadata
-        path_raw = Path(self.source_data["path_raw"])
+        path_raw = Path(self.source_data["path_ecephys_raw"])
         with h5py.File(path_raw, 'r') as f:
-            ecephys_rate = 1 / np.array(f['dte'])
+            ecephys_rate = 1 / np.array(f['dte'][0])
         metadata['Ecephys']['ElectricalSeries_raw'] = {
             'name': 'ElectricalSeries_raw',
             'description': 'ADDME',
             'rate': float(ecephys_rate)
+        }
+
+        # Processed electrical series metadata
+        metadata['Ecephys']['ElectricalSeries_processed'] = {
+            'name': 'ElectricalSeries_processed',
+            'description': 'voltage trace filtered between 250 Hz and 5 kHz'
         }
 
         return metadata
@@ -65,6 +71,9 @@ class AllenEcephysInterface(BaseDataInterface):
         add_ecephys_spiking : boolean
         """
         if add_ecephys_raw or add_ecephys_processed:
+            # Device
+            nwbfile.create_device(**metadata['Ecephys']['Device'])
+
             # ElectrodeGroups
             self._create_electrode_groups(
                 nwbfile=nwbfile,
@@ -146,7 +155,7 @@ class AllenEcephysInterface(BaseDataInterface):
     def _create_ecephys_raw(self, nwbfile: NWBFile, metadata_ecephys: dict):
         """Add raw membrane voltage data"""
         print('Converting raw ecephys data...')
-        path_raw = self.input_args["path_raw"]
+        path_raw = self.source_data["path_ecephys_raw"]
         with h5py.File(path_raw, 'r') as f:
             electrode_table_region = nwbfile.create_electrode_table_region(
                 region=[0],
@@ -169,10 +178,35 @@ class AllenEcephysInterface(BaseDataInterface):
 
     def _create_ecephys_processed(self, nwbfile: NWBFile, metadata_ecephys: dict):
         """Add processed membrane voltage data"""
-        raise NotImplementedError('TODO')
         print('Converting processed ecephys data...')
+        with h5py.File(self.source_data['path_ecephys_processed'], 'r') as f:
+            electrode_table_region = nwbfile.create_electrode_table_region(
+                region=[0],
+                description='electrode'
+            )
+            ecephys_rate = 1 / np.array(f['dte'][0])
+
+            # trace_data = np.squeeze(f['ephys_baseline_subtracted'])
+            trace_data = np.squeeze(f['Vmfd'])
+            electrical_series = pynwb.ecephys.ElectricalSeries(
+                name=metadata_ecephys['ElectricalSeries_processed']['name'],
+                description=metadata_ecephys['ElectricalSeries_processed']['description'],
+                data=trace_data,
+                electrodes=electrode_table_region,
+                starting_time=0.,
+                rate=ecephys_rate,
+            )
+
+            # Stores processed data
+            ecephys_module = nwbfile.create_processing_module(
+                name='ecephys',
+                description='contains extracellular electrophysiology processed data'
+            )
+            ecephys_module.add(electrical_series)
 
     def _create_ecephys_spiking(self, nwbfile: NWBFile, metadata_ecephys: dict):
         """Add spiking data"""
-        raise NotImplementedError('TODO')
         print('Converting spiking data...')
+        with h5py.File(self.source_data['path_ecephys_processed'], 'r') as f:
+            spike_times = np.where(f['spk'][0])[0] * f['dte'][0]
+            nwbfile.add_unit(spike_times=spike_times)

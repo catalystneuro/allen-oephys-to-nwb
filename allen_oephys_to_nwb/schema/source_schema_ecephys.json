@@ -6,11 +6,14 @@
   "version": "0.1.0",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "path_raw"
-  ],
+  "required": [],
   "properties": {
-    "path_raw": {
+    "path_ecephys_raw": {
+      "type": "string",
+      "format": "file",
+      "description": "path to raw data file"
+    },
+    "path_ecephys_processed": {
       "type": "string",
       "format": "file",
       "description": "path to raw data file"

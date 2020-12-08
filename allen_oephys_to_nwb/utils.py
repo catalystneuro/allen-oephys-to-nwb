@@ -45,7 +45,7 @@ def get_basic_metadata(source_data):
         Subject=dict(
             subject_id=subject_info['subject_id'],
             genotype=subject_info['line'],
-            age=subject_info['age']
+            age=str(subject_info['age'])
         )
     )
 

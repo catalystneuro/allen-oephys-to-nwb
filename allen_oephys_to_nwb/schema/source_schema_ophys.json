@@ -18,7 +18,7 @@
       "format": "file",
       "description": "path to tiff data file"
     },
-    "path_processed": {
+    "path_ophys_processed": {
       "type": "string",
       "format": "file",
       "description": "path to processed data file"
