@@ -35,7 +35,7 @@ Ophys:
       - name: plane_segmentation
         description: ADDME
         imaging_plane: imaging_plane
-        reference_images: raw_ophys
+        reference_images: TwoPhotonSeries_green
   ImagingPlane:
     description: ADDME
     device: Bruker 2-p microscope
@@ -48,6 +48,6 @@ Ophys:
       - description: 2P Optical Channel
         emission_lambda: 510.0
         name: optical_channel
-  TwoPhotonSeries:
-    name: raw_ophys
+  TwoPhotonSeries_green:
+    name: TwoPhotonSeries_green
     imaging_plane: imaging_plane

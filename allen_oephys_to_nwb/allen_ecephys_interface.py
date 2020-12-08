@@ -199,7 +199,7 @@ class AllenEcephysInterface(BaseDataInterface):
 
             # Stores processed data
             ecephys_module = nwbfile.create_processing_module(
-                name='ecephys',
+                name='Ecephys',
                 description='contains extracellular electrophysiology processed data'
             )
             ecephys_module.add(electrical_series)
