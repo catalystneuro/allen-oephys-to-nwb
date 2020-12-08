@@ -6,11 +6,11 @@ import uuid
 import h5py
 
 
-def get_basic_metadata(input_args):
+def get_basic_metadata(source_data):
     """Get basic metadata info from files"""
 
-    if 'path_subjects_info' in input_args:
-        subjects_info_path = input_args['path_subjects_info']
+    if 'path_subjects_info' in source_data:
+        subjects_info_path = source_data['path_subjects_info']
         if Path(subjects_info_path).is_file():
             with open(subjects_info_path, 'r') as inp:
                 all_subjects_info = json.load(inp)
@@ -23,11 +23,11 @@ def get_basic_metadata(input_args):
     }
 
     session_identifier = str(uuid.uuid4())
-    if 'path_processed' in input_args and Path(input_args['path_processed']).is_file():
-        with h5py.File(input_args['path_processed'], 'r') as f:
+    if 'path_processed' in source_data and Path(source_data['path_processed']).is_file():
+        with h5py.File(source_data['path_processed'], 'r') as f:
             session_identifier = str(int(f['tid'][0]))
             if np.isnan(f['aid'][0]):
-                print(f"File {input_args['path_processed']} does not have 'aid' key. Skipping it...")
+                print(f"File {source_data['path_processed']} does not have 'aid' key. Skipping it...")
             else:
                 subject_id = str(int(f['aid'][0]))
                 subject_info = all_subjects_info[subject_id]

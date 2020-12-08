@@ -1,5 +1,6 @@
 from nwb_conversion_tools.basedatainterface import BaseDataInterface
-#from nwb_conversion_tools.utils import get_schema_from_hdmf_class, get_base_schema, get_metadata_schema
+from nwb_conversion_tools.utils import get_schema_from_hdmf_class
+from nwb_conversion_tools.json_schema_utils import get_base_schema
 from pynwb import NWBFile
 import pynwb
 
@@ -17,15 +18,12 @@ class AllenOphysInterface(BaseDataInterface):
 
     @classmethod
     def get_source_schema(cls):
-        with pkg_resources.open_text(schema, 'input_schema_ophys.json') as f:
-            input_schema = json.load(f)
-        return input_schema
-
-    def __init__(self, **input_args):
-        super().__init__(**input_args)
+        with pkg_resources.open_text(schema, 'source_schema_ophys.json') as f:
+            source_schema = json.load(f)
+        return source_schema
 
     def get_metadata_schema(self):
-        metadata_schema = get_metadata_schema()
+        metadata_schema = super().get_metadata_schema()
         metadata_schema['properties']['Ophys'] = get_base_schema(tag='Ophys')
         metadata_schema['properties']['Ophys']['properties']['Device'] = get_schema_from_hdmf_class(pynwb.device.Device)
         metadata_schema['properties']['Ophys']['properties']['ImagingPlane'] = get_schema_from_hdmf_class(pynwb.ophys.ImagingPlane)
@@ -38,7 +36,7 @@ class AllenOphysInterface(BaseDataInterface):
     def get_metadata(self):
         """Auto-fill as much of the metadata as possible."""
 
-        metadata = get_basic_metadata(input_args=self.input_args)
+        metadata = get_basic_metadata(source_data=self.source_data)
         metadata['Ophys'] = dict(
             Device=dict(name='Bruker 2-p microscope'),
             Fluorescence=dict(name='Fluorescence'),
@@ -66,8 +64,14 @@ class AllenOphysInterface(BaseDataInterface):
 
         return metadata
 
-    def convert_data(self, nwbfile: NWBFile, metadata_dict: dict,
-                     stub_test: bool = False):
+    def run_conversion(self, nwbfile: NWBFile, metadata: dict,
+                       stub_test: bool = False, add_ophys_raw: bool = False,
+                       add_ophys_processed: bool = False):
+        """
+        Options:
+        add_ophys_raw : boolean
+        add_ophys_processed : boolean
+        """
         print(nwbfile)
         # raise NotImplementedError('TODO')
 

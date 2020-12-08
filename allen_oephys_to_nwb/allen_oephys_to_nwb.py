@@ -22,9 +22,6 @@ class AllenOephysNWBConverter(NWBConverter):
         'AllenOphysInterface': AllenOphysInterface,
     }
 
-    def __init__(self, input_data):
-        super().__init__(**input_data)
-
     def run_conversion_old(self, source_paths, metadata=None, nwbfile=None):
 
         raise NotImplementedError('This is the old code, needs to be refactored into the new converter')

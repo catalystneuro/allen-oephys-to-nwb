@@ -1,5 +1,6 @@
 from nwb_conversion_tools.basedatainterface import BaseDataInterface
-#from nwb_conversion_tools.utils import get_metadata_schema, get_base_schema, get_schema_from_hdmf_class
+from nwb_conversion_tools.utils import get_schema_from_hdmf_class
+from nwb_conversion_tools.json_schema_utils import get_base_schema
 import pynwb
 from pynwb import NWBFile
 from pathlib import Path
@@ -15,15 +16,12 @@ class AllenEcephysInterface(BaseDataInterface):
 
     @classmethod
     def get_source_schema(cls):
-        with pkg_resources.open_text(schema, 'input_schema_ecephys.json') as f:
-            input_schema = json.load(f)
-        return input_schema
-
-    def __init__(self, **input_args):
-        super().__init__(**input_args)
+        with pkg_resources.open_text(schema, 'source_schema_ecephys.json') as f:
+            source_schema = json.load(f)
+        return source_schema
 
     def get_metadata_schema(self):
-        metadata_schema = get_metadata_schema()
+        metadata_schema = super().get_metadata_schema()
         metadata_schema['properties']['Ecephys'] = get_base_schema(tag='Ecephys')
         metadata_schema['properties']['Ecephys']['properties']['Device'] = get_schema_from_hdmf_class(pynwb.device.Device)
         metadata_schema['properties']['Ecephys']['properties']['ElectrodeGroup'] = get_schema_from_hdmf_class(pynwb.ecephys.ElectrodeGroup)
@@ -34,7 +32,7 @@ class AllenEcephysInterface(BaseDataInterface):
     def get_metadata(self):
         """Auto-fill as much of the metadata as possible."""
 
-        metadata = get_basic_metadata(input_args=self.input_args)
+        metadata = get_basic_metadata(source_data=self.source_data)
         metadata['Ecephys'] = dict(
             Device=dict(name='MultiClamp 700B'),
             ElectrodeGroup=dict(
@@ -46,7 +44,7 @@ class AllenEcephysInterface(BaseDataInterface):
         )
 
         # Raw electrical series metadata
-        path_raw = Path(self.input_args["path_raw"])
+        path_raw = Path(self.source_data["path_raw"])
         with h5py.File(path_raw, 'r') as f:
             ecephys_rate = 1 / np.array(f['dte'])
         metadata['Ecephys']['ElectricalSeries_raw'] = {
@@ -57,37 +55,43 @@ class AllenEcephysInterface(BaseDataInterface):
 
         return metadata
 
-    def convert_data(self, nwbfile: NWBFile, metadata_dict: dict,
-                     stub_test: bool = False):
-
-        if self.input_args['ecephys_raw'] or self.input_args['ecephys_processed']:
+    def run_conversion(self, nwbfile: NWBFile, metadata: dict,
+                       stub_test: bool = False, add_ecephys_raw: bool = False,
+                       add_ecephys_processed: bool = False, add_ecephys_spiking: bool = False):
+        """
+        Options:
+        add_ecephys_raw : boolean
+        add_ecephys_processed : boolean
+        add_ecephys_spiking : boolean
+        """
+        if add_ecephys_raw or add_ecephys_processed:
             # ElectrodeGroups
             self._create_electrode_groups(
                 nwbfile=nwbfile,
-                metadata_ecephys=metadata_dict['Ecephys']
+                metadata_ecephys=metadata['Ecephys']
             )
             # Electrodes
             self._create_electrodes(nwbfile=nwbfile)
 
-        if self.input_args['ecephys_raw']:
+        if add_ecephys_raw:
             # Raw ecephys
             self._create_ecephys_raw(
                 nwbfile=nwbfile,
-                metadata_ecephys=metadata_dict['Ecephys']
+                metadata_ecephys=metadata['Ecephys']
             )
 
-        if self.input_args['ecephys_processed']:
+        if add_ecephys_processed:
             # Processed ecephys
             self._create_ecephys_processed(
                 nwbfile=nwbfile,
-                metadata_ecephys=metadata_dict['Ecephys']
+                metadata_ecephys=metadata['Ecephys']
             )
 
-        if self.input_args['ecephys_spiking']:
+        if add_ecephys_spiking:
             # Spiking data ecephys
             self._create_ecephys_spiking(
                 nwbfile=nwbfile,
-                metadata_ecephys=metadata_dict['Ecephys']
+                metadata_ecephys=metadata['Ecephys']
             )
 
     def _create_electrode_groups(self, nwbfile: NWBFile, metadata_ecephys: dict):
