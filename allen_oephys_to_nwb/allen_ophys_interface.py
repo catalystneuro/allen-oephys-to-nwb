@@ -156,7 +156,7 @@ class AllenOphysInterface(BaseDataInterface):
         with h5py.File(self.source_data['path_ophys_processed'], 'r') as f:
             # Stores segmented data
             ophys_module = nwbfile.create_processing_module(
-                name='Ophys',
+                name='ophys',
                 description='contains optical physiology processed data'
             )
 
