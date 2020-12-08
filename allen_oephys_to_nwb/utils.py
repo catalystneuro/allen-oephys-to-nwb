@@ -26,11 +26,16 @@ def get_basic_metadata(source_data):
     }
 
     session_identifier = str(uuid.uuid4())
-    if 'path_processed' in source_data and Path(source_data['path_processed']).is_file():
-        with h5py.File(source_data['path_processed'], 'r') as f:
+    fname = None
+    if 'path_ecephys_processed' in source_data and Path(source_data['path_ecephys_processed']).is_file():
+        fname = source_data['path_ecephys_processed']
+    elif 'path_ophys_processed' in source_data and Path(source_data['path_ophys_processed']).is_file():
+        fname = source_data['path_ophys_processed']
+    if fname:
+        with h5py.File(fname, 'r') as f:
             session_identifier = str(int(f['tid'][0]))
             if np.isnan(f['aid'][0]):
-                print(f"File {source_data['path_processed']} does not have 'aid' key. Skipping it...")
+                print(f"File {fname} does not have 'aid' key. Skipping it...")
             else:
                 subject_id = str(int(f['aid'][0]))
                 subject_info = all_subjects_info[subject_id]
