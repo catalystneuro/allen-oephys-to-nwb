@@ -31,7 +31,6 @@ class AllenOphysInterface(BaseDataInterface):
         metadata_schema['properties']['Ophys']['properties']['ImagingPlane'] = get_schema_from_hdmf_class(pynwb.ophys.ImagingPlane)
         metadata_schema['properties']['Ophys']['properties']['TwoPhotonSeries_green'] = get_schema_from_hdmf_class(pynwb.ophys.TwoPhotonSeries)
         metadata_schema['properties']['Ophys']['properties']['Fluorescence'] = get_schema_from_hdmf_class(pynwb.ophys.Fluorescence)
-        metadata_schema['properties']['Ophys']['properties']['ImageSegmentation'] = get_schema_from_hdmf_class(pynwb.ophys.ImageSegmentation)
 
         return metadata_schema
 
@@ -60,16 +59,6 @@ class AllenOphysInterface(BaseDataInterface):
                         name='optical_channel',
                         description='2P Optical Channel',
                         emission_lambda=510.0
-                    )
-                ]
-            ),
-            ImageSegmentation=dict(
-                name='ImageSegmentation',
-                plane_segmentations=[
-                    dict(
-                        name='plane_segmentation',
-                        description='ADDME',
-                        imaging_plane='ImagingPlane'
                     )
                 ]
             ),
@@ -161,21 +150,14 @@ class AllenOphysInterface(BaseDataInterface):
             )
 
             # Image Segmentation
-            meta_imgseg = metadata['Ophys']['ImageSegmentation']
-            img_seg = pynwb.ophys.ImageSegmentation(name=meta_imgseg['name'])
+            img_seg = pynwb.ophys.ImageSegmentation(name='ImageSegmentation')
             ophys_module.add(img_seg)
 
             # Plane Segmentation
-            meta_planeseg = meta_imgseg['plane_segmentations'][0]
-            # if 'reference_images' in meta_planeseg and meta_planeseg['reference_images'] in nwbfile.acquisition:
-            #     reference_images = nwbfile.acquisition[meta_planeseg['reference_images']]
-            # else:
-            #     reference_images = None
             plane_segmentation = img_seg.create_plane_segmentation(
-                name=meta_planeseg['name'],
-                description=meta_planeseg['description'],
+                name='PlaneSegmentation',
+                description='no description',
                 imaging_plane=imaging_plane,
-                # reference_images=reference_images,
             )
 
             # ROIs
