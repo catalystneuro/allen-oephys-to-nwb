@@ -14,10 +14,15 @@ An example notebook can be found [here](https://github.com/catalystneuro/allen-o
 
 
 **2. Graphical User Interface:** <br/>
-To use the GUI, just type in the terminal:
+To use the GUI, first install [nwb-web-gui](https://github.com/catalystneuro/nwb-web-gui):
+```shell
+$ pip install nwb-web-gui
+```
+
+The GUI can be run from the terminal:
 ```shell
 $ nwbgui-oephys
 ```
-The NWB-WebGUI should open in your browser. If it does not open automatically (and no error messages were printed in your terminal), just open your browser and navigate to `localhost:5000`.
+The NWB Web GUI should open in your browser. If it does not open automatically (and no error messages were printed in your terminal), just open your browser and navigate to `localhost:5000`.
 
 The GUI eases the task of editing the metadata of the resulting `nwb` file, it is integrated with the conversion module (conversion on-click) and allows for quick visual exploration the data in the end file with [nwb-jupyter-widgets](https://github.com/NeurodataWithoutBorders/nwb-jupyter-widgets).
